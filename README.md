@@ -2,7 +2,7 @@
 
 1. Git clone/pull the repository to your own local directory
 2. Install npm packages using `npm install`
-3. Make sure you have a `.env` file in the source directory, with just one line of code. `NODE_PATH=src/`
+3. Make sure you have a `.env` file in the source directory, with just one line of code `NODE_PATH=src/`
 
 ## Available Scripts
 
