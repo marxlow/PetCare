@@ -6,7 +6,8 @@ class RegisterPage extends Component {
     super(props);
     this.state = {
       email: '',
-      password: ''
+      password: '',
+      options: [{ role: 'Pet Owner', chosen: true }, { role: 'Care Taker', chosen: false }]
     };
   }
 
@@ -24,7 +25,20 @@ class RegisterPage extends Component {
     this.props.history.push('/login');
   });
 
+  onUpdateRole =((event) => {
+    const nextOptions = this.state.options;
+    for (let i = 0; i < nextOptions.length; i++) {
+      if (nextOptions[i].role === event.target.value.trim()) {
+        nextOptions[i].chosen = true;
+      } else {
+        nextOptions[i].chosen = false;
+      }
+    }
+    this.setState({ options: nextOptions });
+  });
+
   render() {
+
     return (
       <SplitLayout>
         <div className="d-flex align-items-center vh-100">
@@ -39,6 +53,18 @@ class RegisterPage extends Component {
               <div className="form-group">
                 <label for="inputPassword">Password</label>
                 <input type="password" className="form-control" id="inputPassword" placeholder="Password" onChange={this.updatePassword} />
+              </div>
+              <div className="form-group">
+                <label for="inputState">Role</label>
+                <select id="inputState" className="form-control" onChange={this.onUpdateRole}>
+                  {this.state.options.map((opt, key) => {
+                    return(
+                      opt.chosen 
+                      ? <option selected key={key} value={opt.role}>{opt.role}</option>
+                      : <option key={key} value={opt.role}>{opt.role}</option>
+                    )
+                  })}
+                </select>
               </div>
               <button type="submit" className="btn btn-primary">Submit</button>
             </form>
