@@ -2,6 +2,10 @@
   background-image: linear-gradient(to right, #ea7e75, #e0dedf);
 }
 
+.bg-brand {
+
+  background-color: #ea7e75
+}
 .bg-brand-secondary {
   background-color: #e0dedf
 }

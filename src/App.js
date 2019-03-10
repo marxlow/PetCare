@@ -7,6 +7,7 @@ import RegisterPage from 'pages/RegisterPage';
 import AboutPage from 'pages/AboutPage';
 
 import './app.css';
+import 'antd/dist/antd.css';
 
 class App extends Component {
 
