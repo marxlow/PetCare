@@ -1,6 +1,6 @@
 //TODO: To Check session token of user
 const isLoggedIn = (() => {
-    return false;
+    return true;
 });
 
 export default isLoggedIn;

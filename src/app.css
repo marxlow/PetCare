@@ -1,0 +1,15 @@
+.bg-brand-grad {
+  background-image: linear-gradient(to right, #ea7e75, #e0dedf);
+}
+
+.bg-brand-secondary {
+  background-color: #e0dedf
+}
+
+.brand-color-secondary {
+  color: #e0dedf
+}
+
+.width-10 {
+  width: '10rem',
+}
