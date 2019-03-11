@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Slider, Button, List, Card, Divider } from 'antd';
+import DateSection from './DateSection';
 
 const ListItem = List.item;
 
@@ -54,6 +55,9 @@ class CareTakerSearchSection extends Component {
           <div className="col-5 d-flex flex-column mt-2">
             <span>Years of Experience</span>
             <Slider defaultValue={experience} max={20} min={0} onChange={this.updateSearchExperience} />
+          </div>
+          <div>
+            <DateSection />
           </div>
           <div className="d-flex justify-content-center mt-2">
             <Button className="col-3 mt-2" type="primary" htmlType="submit">Search</Button>
