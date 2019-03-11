@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Form, Input, Select, Button, Divider, List, Avatar } from 'antd';
+import { Form, Input, Select, Button, Divider, List, Avatar, Alert } from 'antd';
+// import SubmitResponse from './SubmitResponse';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -28,7 +29,8 @@ class PetSection extends Component {
       nickName: '',
       breed: '',
       specialNote: '',
-      diet: ''
+      diet: '',
+      alert: 'invisible'
     };
     this.handleNickNameChange = (e) => {
       console.log('handleNickNameChange: ' + e.target.value);
@@ -51,8 +53,9 @@ class PetSection extends Component {
   addToPets = ((event) => {
     if (this.state.nickName == '' ||
       this.state.breed == '' ||
-      //this.state.specialNote == '' ||
+      // this.state.specialNote == '' ||
       this.state.diet == ''){
+      this.state.alert = 'empty'
       console.log('Empty fields: Will not update pets');
       return
     }
@@ -67,23 +70,78 @@ class PetSection extends Component {
     for (var i=0; i<nextPets.length; i++){
       if (nextPets[i].nickName == this.state.nickName && 
           nextPets[i].breed == this.state.breed ){
+        this.state.alert = 'duplicate'
         console.log('Duplicated NickName and Breed: ('+this.state.nickName+', '+this.state.breed+') Will not update pets');
         return
       }
     }
-
     console.log('onClick Event addToPets: Adding '+ JSON.stringify(newPet));
     nextPets.push(newPet);
+    // this.setState({ 
+    //   pets: nextPets,
+    //   nickName: '',
+    //   breed: '',
+    //   specialNote: '',
+    //   diet: '',
+    //   alert: 'success'
+    // });
     this.setState({ 
       pets: nextPets,
-      nickName: '',
-      breed: '',
-      specialNote: '',
-      diet: ''
+      nickName: this.state.nickName,
+      breed: this.state.breed,
+      specialNote: this.state.specialNote,
+      diet: this.state.diet,
+      alert: 'success'
     });
     console.log('Updated' + JSON.stringify(this.state.pets));
-    this.props.form.resetFields();
+    // this.props.form.resetFields();
   });
+
+  handleClose = (() => {
+    this.state.alert = 'invisible';
+  });
+
+  SubmitResponse = (e) => {
+        switch(this.state.alert) {
+          case 'success':
+          return (<Alert
+              message="Successful Update"
+              type="success"
+              showIcon
+              closable
+              afterClose={this.handleClose}
+            />);
+          case 'empty':  
+            return (<Alert
+                message="Error"
+                description="There are missing fields. Please input them and submit again."
+                type="error"
+                showIcon
+                closable
+                afterClose={this.handleClose}
+              />);
+          // case 'duplicateName':
+          //   return <Alert
+          //       message="Warning"
+          //       description="This is a warning notice about copywriting."
+          //       type="warning"
+          //       showIcon
+          //       closable
+          //       afterClose={this.handleClose}
+          //     />;
+          case 'duplicate':  
+            return (<Alert
+                message="Error"
+                description="There are duplicate Pets with similar nickname and breed."
+                type="error"
+                showIcon
+                closable
+                afterClose={this.handleClose}
+              />);
+          default:
+            return null; 
+        }
+  };
 
   render() {
     const { getFieldDecorator } = this.props.form;
@@ -91,7 +149,7 @@ class PetSection extends Component {
     return (
       <div>
         {/* Adding new pets */}
-        <Form className="d-flex flex-column" onSubmit={this.addNewDog}>
+        <Form className="d-flex flex-column" onAbort={this.handleClose}>
           <div className="d-flex w-100">
             <FormItem className="col-5 mx-2" label="NickName">
               {getFieldDecorator('petNickName', {
@@ -132,6 +190,9 @@ class PetSection extends Component {
             </FormItem>
           </div>
           <Button className="col-3" type="primary" htmlType="submit" onClick={this.addToPets}>Add Pet</Button>
+          {/* Submission response alerts when there is error */}
+          {this.SubmitResponse}
+          {/* <SubmitResponse alert={this.state.alert} /> */}
         </Form>
         <Divider />
         <List
@@ -148,8 +209,8 @@ class PetSection extends Component {
           )}
         />
       </div >
-        )
-      }
-    }
+    )
+  }
+}
     
 export default Form.create({name: "pet" })(PetSection);
