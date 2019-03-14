@@ -20,8 +20,6 @@ const petStubs = [
   }
 ];
 
-var submitted = false
-
 class PetSection extends Component {
   constructor(props) {
     super(props);
@@ -34,6 +32,8 @@ class PetSection extends Component {
       alert: 'invisible',
       submitted: true
     };
+    // Changed to true when Add pet button is clicked
+    this.submitted = false
     this.handleNickNameChange = (e) => {
       console.log('handleNickNameChange: ' + e.target.value);
       this.setState({ nickName: e.target.value })
@@ -54,11 +54,11 @@ class PetSection extends Component {
 
   toggleSubmitted = (() => {
     this.setState({ submitted: !this.state.submitted })
-      console.log('toggled submitted: '+ submitted)
+      console.log('toggled submitted: '+ this.submitted)
   })
 
   addToPets = ((event) => {
-    submitted = true
+    this.submitted = true
     this.toggleSubmitted()
     if (this.state.nickName === '' ||
       this.state.breed === '' ||
@@ -98,9 +98,9 @@ class PetSection extends Component {
   });
 
   SubmitResponse = (e) => {
-    console.log('SubmitResponse: ' + submitted)
-    if (submitted === true) {
-      submitted = false
+    console.log('SubmitResponse: ' + this.submitted)
+    if (this.submitted === true) {
+      this.submitted = false
       switch(this.state.alert) {
         case 'success':
         return (<Alert
