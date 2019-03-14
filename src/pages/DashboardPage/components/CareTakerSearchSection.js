@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { Slider, Button, List, Card, Divider } from 'antd';
 import DateSection from './DateSection';
+import { Slider, Button, List, Card, Divider, InputNumber } from 'antd';
 
-const ListItem = List.item;
+const ListItem = List.Item;
 
 class CareTakerSearchSection extends Component {
 
@@ -72,9 +72,24 @@ class CareTakerSearchSection extends Component {
             }}
             dataSource={resultStub}
             renderItem={item => (
-              <List.Item>
-                <Card title={item.name}>{item.specialty}</Card>
-              </List.Item>
+              <ListItem>
+                <Card
+                  hoverable={true}
+                  title={item.name}
+                >
+                  {item.specialty}
+                </Card>
+                <InputNumber
+                  defaultValue={1000}
+                  className={"w-100"}
+                  size={'large'}
+                  formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  parser={value => value.replace(/\$\s?|(,*)/g, '')}
+                // onChange={onChange}
+                />
+                <Button className={"w-100"}>Confirm Bid</Button>
+                
+              </ListItem>
             )}
           />
         </section>
