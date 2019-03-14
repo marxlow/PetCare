@@ -9,6 +9,7 @@ class DateSection extends Component {
   onChange = ((date, dateString) => {
     const startDate = dateString[0];
     const endDate = dateString[1];
+    this.props.changeDate(startDate, endDate)
   });
 
   render(){

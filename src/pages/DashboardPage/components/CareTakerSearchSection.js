@@ -10,16 +10,26 @@ class CareTakerSearchSection extends Component {
     super(props);
     this.state = {
       rating: 5,
-      experience: 10
+      experience: 10,
+      startDate: '',
+      endDate: ''
     }
   }
 
   updateSearchRating = ((value) => {
+    console.log('rating change: '+ value)
     this.setState({ rating: value });
   })
 
   updateSearchExperience = ((value) => {
+    console.log('experience change: '+ value)
     this.setState({ experience: value });
+  })
+
+  changeDate = ((startDate, endDate) => {
+    this.setState({ startDate: startDate });
+    this.setState({ endDate: endDate });
+    console.log('State: '+JSON.stringify(this.state))
   })
 
   render() {
@@ -57,7 +67,7 @@ class CareTakerSearchSection extends Component {
             <Slider defaultValue={experience} max={20} min={0} onChange={this.updateSearchExperience} />
           </div>
           <div>
-            <DateSection />
+            <DateSection changeDate={this.changeDate}/>
           </div>
           <div className="d-flex justify-content-center mt-2">
             <Button className="col-3 mt-2" type="primary" htmlType="submit">Search</Button>
