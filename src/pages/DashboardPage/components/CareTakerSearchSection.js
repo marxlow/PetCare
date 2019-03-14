@@ -70,7 +70,7 @@ class CareTakerSearchSection extends Component {
             <DateSection changeDate={this.changeDate}/>
           </div>
           <div className="d-flex justify-content-center mt-2">
-            <Button className="col-3 mt-2" type="primary" htmlType="submit">Search</Button>
+            <Button className="col-3 mt-2" type="primary" htmlType="submit" onClick>Search</Button>
           </div>
         </section>
         <Divider />
@@ -83,7 +83,9 @@ class CareTakerSearchSection extends Component {
             dataSource={resultStub}
             renderItem={item => (
               <List.Item>
-                <Card title={item.name}>{item.specialty}</Card>
+                <Card title={item.name}>Specialty: {item.specialty}<br/>
+                Rating: {item.rating}<br/>
+                Experience: {item.experience}</Card>
               </List.Item>
             )}
           />
