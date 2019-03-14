@@ -51,9 +51,9 @@ class DashboardPage extends Component {
                 </TabPane>
 
                 {/* Setting dates that each dog wants to be taken care of */}
-                <TabPane tab="Dates" key="2">
-                  {/* <DateSection /> */}
-                </TabPane>
+                {/* <TabPane tab="Dates" key="2">
+                  <DateSection />
+                </TabPane> */}
 
                 {/* Searching & Bidding for care takers */}
                 <TabPane tab="Search" key="3">
