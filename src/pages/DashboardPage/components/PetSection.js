@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Form, Input, Select, Button, Divider, List, Avatar, Alert } from 'antd';
-// import SubmitResponse from './SubmitResponse';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -21,6 +20,8 @@ const petStubs = [
   }
 ];
 
+var submitted = false
+
 class PetSection extends Component {
   constructor(props) {
     super(props);
@@ -30,36 +31,44 @@ class PetSection extends Component {
       breed: '',
       specialNote: '',
       diet: '',
-      alert: 'invisible'
+      alert: 'invisible',
+      submitted: true
     };
     this.handleNickNameChange = (e) => {
       console.log('handleNickNameChange: ' + e.target.value);
-      this.state.nickName = e.target.value
+      this.setState({ nickName: e.target.value })
     };
     this.handleBreedChange = (value, e) => {
       console.log('handleBreedChange: ' + value);
-      this.state.breed = value
+      this.setState({ breed: value })
     };
     this.handleDietChange = (value, e) => {
       console.log('handleDietChange: ' + value);
-      this.state.diet = value
+      this.setState({ diet: value })
     };
     this.handleSpecialNoteChange = (e) => {
       console.log('handleSpecialNoteChange: ' + e.target.value);
-      this.state.specialNote = e.target.value
+      this.setState({ specialNote: e.target.value })
     };
   }
 
+  toggleSubmitted = (() => {
+    this.setState({ submitted: !this.state.submitted })
+      console.log('toggled submitted: '+ submitted)
+  })
+
   addToPets = ((event) => {
-    if (this.state.nickName == '' ||
-      this.state.breed == '' ||
-      // this.state.specialNote == '' ||
-      this.state.diet == ''){
-      this.state.alert = 'empty'
+    submitted = true
+    this.toggleSubmitted()
+    if (this.state.nickName === '' ||
+      this.state.breed === '' ||
+      // this.state.specialNote === '' ||
+      this.state.diet === ''){
+        this.setState({ alert: 'empty' })
       console.log('Empty fields: Will not update pets');
       return
     }
-    var newPet = { 
+    var newPet = {
       nickName: this.state.nickName,
       breed: this.state.breed,
       specialNote: this.state.specialNote,
@@ -68,79 +77,70 @@ class PetSection extends Component {
     const nextPets = Object.assign([], this.state.pets);
     // Check if there are duplicate (nickName, breed)
     for (var i=0; i<nextPets.length; i++){
-      if (nextPets[i].nickName == this.state.nickName && 
-          nextPets[i].breed == this.state.breed ){
-        this.state.alert = 'duplicate'
+      if (nextPets[i].nickName === this.state.nickName && 
+          nextPets[i].breed === this.state.breed ){
+        this.setState({ alert: 'duplicate' })
         console.log('Duplicated NickName and Breed: ('+this.state.nickName+', '+this.state.breed+') Will not update pets');
         return
       }
     }
     console.log('onClick Event addToPets: Adding '+ JSON.stringify(newPet));
     nextPets.push(newPet);
-    // this.setState({ 
-    //   pets: nextPets,
-    //   nickName: '',
-    //   breed: '',
-    //   specialNote: '',
-    //   diet: '',
-    //   alert: 'success'
-    // });
     this.setState({ 
       pets: nextPets,
-      nickName: this.state.nickName,
-      breed: this.state.breed,
-      specialNote: this.state.specialNote,
-      diet: this.state.diet,
       alert: 'success'
     });
     console.log('Updated' + JSON.stringify(this.state.pets));
-    // this.props.form.resetFields();
   });
 
   handleClose = (() => {
-    this.state.alert = 'invisible';
+    this.setState({ alert: 'invisible' });
   });
 
   SubmitResponse = (e) => {
-        switch(this.state.alert) {
-          case 'success':
+    console.log('SubmitResponse: ' + submitted)
+    if (submitted === true) {
+      submitted = false
+      switch(this.state.alert) {
+        case 'success':
+        return (<Alert
+            message="Successful Update"
+            type="success"
+            showIcon
+            closable
+            afterClose={this.handleClose}
+          />);
+        case 'empty':  
           return (<Alert
-              message="Successful Update"
-              type="success"
+              message="Error"
+              description="There are missing fields. Please input them and submit again."
+              type="error"
               showIcon
               closable
               afterClose={this.handleClose}
             />);
-          case 'empty':  
-            return (<Alert
-                message="Error"
-                description="There are missing fields. Please input them and submit again."
-                type="error"
-                showIcon
-                closable
-                afterClose={this.handleClose}
-              />);
-          // case 'duplicateName':
-          //   return <Alert
-          //       message="Warning"
-          //       description="This is a warning notice about copywriting."
-          //       type="warning"
-          //       showIcon
-          //       closable
-          //       afterClose={this.handleClose}
-          //     />;
-          case 'duplicate':  
-            return (<Alert
-                message="Error"
-                description="There are duplicate Pets with similar nickname and breed."
-                type="error"
-                showIcon
-                closable
-                afterClose={this.handleClose}
-              />);
-          default:
-            return null; 
-        }
+        // case 'duplicateName':
+        //   return <Alert
+        //       message="Warning"
+        //       description="This is a warning notice about copywriting."
+        //       type="warning"
+        //       showIcon
+        //       closable
+        //       afterClose={this.handleClose}
+        //     />;
+        case 'duplicate':  
+          return (<Alert
+              message="Error"
+              description="There are duplicate Pets with similar nickname and breed."
+              type="error"
+              showIcon
+              closable
+              afterClose={this.handleClose}
+            />);
+        default:
+          return null; 
+      }
+    }
   };
 
   render() {
@@ -189,10 +189,10 @@ class PetSection extends Component {
               )}
             </FormItem>
           </div>
-          <Button className="col-3" type="primary" htmlType="submit" onClick={this.addToPets}>Add Pet</Button>
+          <Button className="col-3" type="primary" htmlType="submit"
+             onClick={this.addToPets}>Add Pet</Button>
           {/* Submission response alerts when there is error */}
-          {this.SubmitResponse}
-          {/* <SubmitResponse alert={this.state.alert} /> */}
+          {this.SubmitResponse()}
         </Form>
         <Divider />
         <List
