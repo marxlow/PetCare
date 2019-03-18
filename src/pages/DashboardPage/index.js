@@ -10,6 +10,9 @@ const TabPane = Tabs.TabPane;
 class DashboardPage extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      pets: [],
+    }
   }
 
   onLogout = ((e) => {
@@ -44,13 +47,13 @@ class DashboardPage extends Component {
               <Tabs type="card">
                 {/* Setting pet information */}
                 <TabPane tab="Profile" key="1">
-                  <PetSection />
+                  <PetSection pets={this.state.pets}/>
                 </TabPane>
 
                 {/* Setting dates that each dog wants to be taken care of */}
-                <TabPane tab="Dates" key="2">
+                {/* <TabPane tab="Dates" key="2">
                   <DateSection />
-                </TabPane>
+                </TabPane> */}
 
                 {/* Searching & Bidding for care takers */}
                 <TabPane tab="Search" key="3">
