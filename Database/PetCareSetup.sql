@@ -1,9 +1,11 @@
+drop table if exists Badges, hasBadge;
+drop table if exists Reviews, Transactions;
 drop table if exists Bids, Availabilities;
-drop table if exists Wallets, Services;
-drop table if exists BreedDietRestrictions;
+drop table if exists Wallets, Services, provideService;
+drop table if exists BreedDietRestrictions, Diet;
 drop table if exists PetBreed;
 drop table if exists Breeds;
-drop table if exists Species cascade;
+drop table if exists Species, isOfSpecies cascade;
 drop table if exists CatBreeds;
 drop table if exists Cats;
 drop table if exists DogBreeds;
@@ -85,14 +87,14 @@ create table PetBreed (
 	breedName varchar(255) references Breeds not null
 );
 
+create table Diet (
+	diet varchar(255) primary key
+);
+
 create table BreedDietRestrictions (
 	breedName varchar(255) references Breeds,
 	diet varchar(255) references Diet,
 	primary key (breedName, diet)
-);
-
-create table Diet (
-	diet varchar(255) primary key
 );
 --end of breed tables format 2
 
@@ -138,7 +140,6 @@ create table provideService (
 
 -- Wallets
 create table Wallets (
-	wid int primary key,
 	email varchar(255) references Users primary key,
 	walletAmt float8 not null 
 );
@@ -153,7 +154,7 @@ create table Transactions (
 	transactFrom varchar(255) references Users not null,
 	transactTo varchar(255) references Users not null,
 	transTimeStamp timestamp not null,
-	transAmt float8 not null,
+	transAmt float8 not null
 );
 
 -- create table hasTransactions (
