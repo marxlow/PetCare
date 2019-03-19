@@ -30,3 +30,7 @@ The build is minified and the filenames include the hashes.<br>
 Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+
+### Connect to Postgresql Database
+
+Create a config.js file in the `src\api\` directory similar to the configExample.js and update the password and database field with your own password (for user postgres) and database name (Capitalized Specific).
