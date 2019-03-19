@@ -8,4 +8,4 @@ const config = {
     user: 'postgres'
 };
 
-module.exports = config;    
+module.exports = config;
