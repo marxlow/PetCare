@@ -68,6 +68,12 @@ create table Pets (
 	speciesName varchar(255) references Species not null
 );
 
+create table isOfSpecies (
+	pid int references Pets,
+	speciesName varchar(255) references Species,
+	primary key (pid, speciesName)
+);
+
 create table OwnsPet (
 	email varchar(255) references PetOwners,
 	pid int references Pets,
@@ -75,14 +81,18 @@ create table OwnsPet (
 );
 
 create table PetBreed (
-	pid int primary key references Pets,
-	breedName varchar(255) references Breeds
+	pid int references Pets primary key,
+	breedName varchar(255) references Breeds not null
 );
 
 create table BreedDietRestrictions (
 	breedName varchar(255) references Breeds,
-	diet varchar(255),
+	diet varchar(255) references Diet,
 	primary key (breedName, diet)
+);
+
+create table Diet (
+	diet varchar(255) primary key
 );
 --end of breed tables format 2
 
@@ -95,25 +105,89 @@ create table Availabilities (
   	daysOfWeek int not null  	
 );
 
+create table hasAvailability (
+	aid int references Availabilities primary key,
+ 	email varchar(255) references Caretakers not null
+);
+
 -- Bidding
 create table Bids (
 	bid int primary key,
 	bidderEmail varchar(255) references PetOwners not null,
 	caretakerEmail varchar(255) references Caretakers not null,
-  	bidDate date not null,
+  	bidTimeStamp timestamp not null,
   	bidAmount int not null
+);
+
+create table BidsOn (
+	bid int references Bids primary key,
+	bidderEmail varchar(255) references PetOwners not null,
+	caretakerEmail varchar(255) references Caretakers not null,	
 );
 
 -- Services Caretaker provides
 create table Services (
-	service varchar(255),
+	serviceid varchar(255) primary key
+);
+
+create table provideService (
+	serviceid varchar(255) references Services,
 	email varchar(255) references Caretakers,
-  	primary key (service, email)
+  	primary key (serviceid, email)
 );
 
 -- Wallets
 create table Wallets (
+	wid int primary key,
 	email varchar(255) references Users primary key,
 	walletAmt float8 not null 
 );
 
+create table hasWallet (
+	wid int references Wallets primary key,
+	email varchar(255) references Users not null
+);
+
+create table Transactions (
+	tid int primary key,
+	transactFrom varchar(255) references Users not null,
+	transactTo varchar(255) references Users not null,
+	transTimeStamp timestamp not null,
+	transAmt float8 not null,
+);
+
+create table hasTransactions (
+	tid int references Transactions,
+	email varchar(255) references Users,
+	primary key (tid, email)
+);
+
+-- Badges/ Reviews
+create table Reviews (
+	rid int primary key,
+	review varchar(1024) not null,
+	email varchar(255) references Caretakers not null,
+	rating int,
+	byUser varchar(255) references PetOwners not null
+);
+
+create table hasReview (
+	rid int references Reviews primary key,
+	email varchar(255) references Caretakers not null
+);
+
+create table gaveReview (
+	rid int references Reviews primary key,
+	email varchar(255) references PetOwners not null
+);
+
+create table Badges (
+	badge varchar(255) primary key,
+	descript varchar(255)
+);
+
+create table hasBadge (
+	badge varchar(255),
+	email varchar(255) references Users,
+	primary key (badge, email)
+);
