@@ -99,16 +99,16 @@ create table Diet (
 -- Availability of Caretakers
 create table Availabilities (
  	aid int primary key,
- 	email varchar(255) references Caretakers, 
+ 	email varchar(255) references Caretakers not null, 
  	startDate date not null,
   	endDate date not null,
   	daysOfWeek int not null  	
 );
 
-create table hasAvailability (
-	aid int references Availabilities primary key,
- 	email varchar(255) references Caretakers not null
-);
+-- create table hasAvailability (
+-- 	aid int references Availabilities primary key,
+--  	email varchar(255) references Caretakers not null
+-- );
 
 -- Bidding
 create table Bids (
@@ -119,11 +119,11 @@ create table Bids (
   	bidAmount int not null
 );
 
-create table BidsOn (
-	bid int references Bids primary key,
-	bidderEmail varchar(255) references PetOwners not null,
-	caretakerEmail varchar(255) references Caretakers not null,	
-);
+-- create table BidsOn (
+-- 	bid int references Bids primary key,
+-- 	bidderEmail varchar(255) references PetOwners not null,
+-- 	caretakerEmail varchar(255) references Caretakers not null,	
+-- );
 
 -- Services Caretaker provides
 create table Services (
@@ -143,10 +143,10 @@ create table Wallets (
 	walletAmt float8 not null 
 );
 
-create table hasWallet (
-	wid int references Wallets primary key,
-	email varchar(255) references Users not null
-);
+-- create table hasWallet (
+-- 	wid int references Wallets primary key,
+-- 	email varchar(255) references Users not null
+-- );
 
 create table Transactions (
 	tid int primary key,
@@ -156,11 +156,11 @@ create table Transactions (
 	transAmt float8 not null,
 );
 
-create table hasTransactions (
-	tid int references Transactions,
-	email varchar(255) references Users,
-	primary key (tid, email)
-);
+-- create table hasTransactions (
+-- 	tid int references Transactions,
+-- 	email varchar(255) references Users,
+-- 	primary key (tid, email)
+-- );
 
 -- Badges/ Reviews
 create table Reviews (
@@ -171,15 +171,15 @@ create table Reviews (
 	byUser varchar(255) references PetOwners not null
 );
 
-create table hasReview (
-	rid int references Reviews primary key,
-	email varchar(255) references Caretakers not null
-);
+-- create table hasReview (
+-- 	rid int references Reviews primary key,
+-- 	email varchar(255) references Caretakers not null
+-- );
 
-create table gaveReview (
-	rid int references Reviews primary key,
-	email varchar(255) references PetOwners not null
-);
+-- create table gaveReview (
+-- 	rid int references Reviews primary key,
+-- 	email varchar(255) references PetOwners not null
+-- );
 
 create table Badges (
 	badge varchar(255) primary key,
