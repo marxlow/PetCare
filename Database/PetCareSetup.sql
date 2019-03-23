@@ -59,8 +59,9 @@ create table Species (
 );
 
 create table Breeds (
-	breedName varchar(255) primary key,
-	speciesName varchar(255) references Species 
+	breedName varchar(255) not null,
+	speciesName varchar(255) references Species,
+    primary key (speciesName, breedName)
 ); 
 
 create table Pets (
@@ -68,13 +69,9 @@ create table Pets (
 	pid int primary key,
 	age int,
 	speciesName varchar(255) references Species not null
+    breedName varchar(255) references Breeds not null
 );
 
-create table isOfSpecies (
-	pid int references Pets,
-	speciesName varchar(255) references Species,
-	primary key (pid, speciesName)
-);
 
 create table OwnsPet (
 	email varchar(255) references PetOwners,
@@ -82,10 +79,6 @@ create table OwnsPet (
 	primary key (email, pid)
 );
 
-create table PetBreed (
-	pid int references Pets primary key,
-	breedName varchar(255) references Breeds not null
-);
 
 create table Diet (
 	diet varchar(255) primary key
