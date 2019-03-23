@@ -1,17 +1,17 @@
-// Entry for backend
-import config from './configExample';
+import localConfig from './localConfig';
 import { Pool } from 'pg';
 
 const pool = new Pool({
-  port: config.port,
-  password: config.password,
-  database: config.database,
-  max: config.max,
-  host: config.host,
-  user: config.user
+  port: localConfig.port,
+  password: localConfig.password,
+  database: localConfig.database,
+  max: localConfig.max,
+  host: localConfig.host,
+  user: localConfig.user
 });
 
-// Connect to DB
+
+// Function to initialize connection to DB
 const connectToDb = (() => {
   console.log('> Trying to connect to DB');
   pool.connect((err, db, done) => {

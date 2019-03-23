@@ -1,5 +1,5 @@
-// Database Config
-const config = {
+// Database Config of your OWN local database
+const localConfig = {
     port: 5432,
     password: '<password>',
     database: '<database name capitalization specific>',
@@ -8,4 +8,4 @@ const config = {
     user: 'postgres'
 };
 
-export default config;
+export default localConfig;

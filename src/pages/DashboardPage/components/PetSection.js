@@ -98,7 +98,6 @@ class PetSection extends Component {
   });
 
   SubmitResponse = (e) => {
-    console.log('SubmitResponse: ' + this.submitted)
     if (this.submitted === true) {
       this.submitted = false
       switch(this.state.alert) {
