@@ -34,3 +34,13 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 ### Connect to Postgresql Database
 
 Create a config.js file in the `src\api\` directory similar to the configExample.js and update the password and database field with your own password (for user postgres) and database name (Capitalized Specific).
+
+## Docker
+
+Make sure you have docker installed before continuing.
+
+1. On your terminal go to the directory of PetCare.
+2. Build the docker container using your current directory. This builds a docker container with the image name "petcare". Run:
+```docker build -t petcare .```
+3. Run the "petcare" docker container at port 3000. Run:
+```d docker run -p 3000:3000 petcare```
