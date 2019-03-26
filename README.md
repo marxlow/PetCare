@@ -43,4 +43,5 @@ Make sure you have docker installed before continuing.
 2. Build the docker container using your current directory. This builds a docker container with the image name "petcare". Run:
 ```docker build -t petcare .```
 3. Run the "petcare" docker container at port 3000. Run:
-```d docker run -p 3000:3000 petcare```
+```docker run -p 3000:3000 petcare```
+4. Go to localhost:3000 to see the app
