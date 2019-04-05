@@ -23,7 +23,7 @@ class RegisterPage extends Component {
   getRole = (() => {
     const options = this.state.options;
     for (let i = 0; i < options.length; i++) {
-      if (options[i].chosen = true){
+      if (options[i].chosen === true){
         return options[i].role
       }
     }
@@ -40,6 +40,7 @@ class RegisterPage extends Component {
       role: this.getRole()
     });
     if (response.status === 200) {
+      console.log("Response> " + response)
       this.props.history.push('/login');
     } else {
       // TODO: Show error
