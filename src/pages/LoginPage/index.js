@@ -22,12 +22,14 @@ class LoginPage extends Component {
   onSubmit = (async (event) => {
     // TODO: Check that user is a valid user in email
     event.preventDefault();
+    const { email, password } = this.state;
     const response = await axios.post('http://localhost:3030/login/', {
-      email: "testing",
-      password: "temp"
+      email, 
+      password,
     });
-    console.log('> Response', response);
-    // this.props.history.push('/');
+    if (response.status === 200) {
+      this.props.history.push('/');
+    }
   });
 
   goToRegister = ((event) => {

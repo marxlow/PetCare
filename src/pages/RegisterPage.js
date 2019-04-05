@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import SplitLayout from 'shared/layouts/SplitLayout';
+import axios from 'axios';
 
 class RegisterPage extends Component {
   constructor(props) {
@@ -19,13 +20,23 @@ class RegisterPage extends Component {
     this.setState({ password: event.target.value });
   });
 
-  onSubmit = ((event) => {
+  onSubmit = (async (event) => {
     // TODO: API call to register user
     event.preventDefault();
-    this.props.history.push('/login');
+    const { email, password } = this.state;
+    const response = await axios.post('http://localhost:3030/register/', {
+      email,
+      password,
+      role: 'Pet Owner'
+    });
+    if (response.status === 200) {
+      this.props.history.push('/login');
+    } else {
+      // TODO: Show error
+    }
   });
 
-  onUpdateRole =((event) => {
+  onUpdateRole = ((event) => {
     const nextOptions = this.state.options;
     for (let i = 0; i < nextOptions.length; i++) {
       if (nextOptions[i].role === event.target.value.trim()) {
@@ -58,10 +69,10 @@ class RegisterPage extends Component {
                 <label for="inputState">Role</label>
                 <select id="inputState" className="form-control" onChange={this.onUpdateRole}>
                   {this.state.options.map((opt, key) => {
-                    return(
-                      opt.chosen 
-                      ? <option selected key={key} value={opt.role}>{opt.role}</option>
-                      : <option key={key} value={opt.role}>{opt.role}</option>
+                    return (
+                      opt.chosen
+                        ? <option selected key={key} value={opt.role}>{opt.role}</option>
+                        : <option key={key} value={opt.role}>{opt.role}</option>
                     )
                   })}
                 </select>
