@@ -20,6 +20,16 @@ class RegisterPage extends Component {
     this.setState({ password: event.target.value });
   });
 
+  getRole = (() => {
+    const options = this.state.options;
+    for (let i = 0; i < options.length; i++) {
+      if (options[i].chosen = true){
+        return options[i].role
+      }
+    }
+    return 'None' //Error should not reach here
+  })
+
   onSubmit = (async (event) => {
     // TODO: API call to register user
     event.preventDefault();
@@ -27,7 +37,7 @@ class RegisterPage extends Component {
     const response = await axios.post('http://localhost:3030/register/', {
       email,
       password,
-      role: 'Pet Owner'
+      role: this.getRole()
     });
     if (response.status === 200) {
       this.props.history.push('/login');
