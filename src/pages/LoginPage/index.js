@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import SplitLayout from 'shared/layouts/SplitLayout';
+import axios from 'axios';
 
 class LoginPage extends Component {
   constructor(props) {
@@ -18,10 +19,15 @@ class LoginPage extends Component {
     this.setState({ password: event.target.value });
   });
 
-  onSubmit = ((event) => {
+  onSubmit = (async (event) => {
     // TODO: Check that user is a valid user in email
     event.preventDefault();
-    this.props.history.push('/');
+    const response = await axios.post('http://localhost:3030/login/', {
+      email: "testing",
+      password: "temp"
+    });
+    console.log('> Response', response);
+    // this.props.history.push('/');
   });
 
   goToRegister = ((event) => {

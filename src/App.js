@@ -5,13 +5,20 @@ import LoginPage from 'pages/LoginPage';
 import DashboardPage from 'pages/DashboardPage';
 import RegisterPage from 'pages/RegisterPage';
 import AboutPage from 'pages/AboutPage';
+import axios from 'axios';
 
 import './app.css';
 import 'antd/dist/antd.css';
 
 class App extends Component {
 
+  testFunction = (async() => {
+    const response = await axios.get('http://localhost:3030/');
+    console.log('> response:', response);
+  });
+
   render() {
+    this.testFunction();
     return (
       <div className="App">
         <BrowserRouter>
