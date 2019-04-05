@@ -5,10 +5,6 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(<App />, document.getElementById('root'));
-
-// Connect to DB - Uncomment the code below after you have updated "api/db/localconfig.js"
-// connectToDb();
-
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: http://bit.ly/CRA-PWA
