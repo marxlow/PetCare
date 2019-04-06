@@ -15,7 +15,7 @@ class DashboardPage extends Component {
     }
   }
 
-  getUserProfile = (() => {
+  getUserProfile = (async (event) => {
     // TODO: API call to register user
     event.preventDefault();
     const { userId } = this.state;
