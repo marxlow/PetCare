@@ -15,6 +15,21 @@ class DashboardPage extends Component {
     }
   }
 
+  getUserProfile = (() => {
+    // TODO: API call to register user
+    event.preventDefault();
+    const { userId } = this.state;
+    const response = await axios.post('http://localhost:3030/', {
+      userId
+    });
+    if (response.status === 200) {
+      userData = response.data
+    } else {
+      // TODO: Show error
+      console.error("Unable to retrieve user profile from Database")
+    }
+  });
+
   onLogout = ((e) => {
     e.preventDefault();
     localStorage.removeItem('userId'); // User is no longer logged in

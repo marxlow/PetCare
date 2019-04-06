@@ -77,9 +77,10 @@ class PetSection extends Component {
       post: 'getSpeciesOpt'
     });
     if (response.status === 200) {
-      speciesOpt = response.status
+      speciesOpt = response.data.speciesName
     } else {
       // TODO: Show error
+      console.error("Unable to retrieve species from Database")
     }
   });
 
@@ -92,9 +93,10 @@ class PetSection extends Component {
       species
     });
     if (response.status === 200) {
-      this.setState({ breedsOpt: response.status })
+      this.setState({ breedsOpt: response.data.breedName })
     } else {
       // TODO: Show error
+      console.error("Unable to retrieve breeds from Database for chosen species")
     }
   });
 

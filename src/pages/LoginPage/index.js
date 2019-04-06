@@ -33,6 +33,8 @@ class LoginPage extends Component {
       this.props.history.push({
         pathname: '/',  
       });
+    } else {
+      console.error("Unable to login. Invalid email or password")
     }
   });
 
