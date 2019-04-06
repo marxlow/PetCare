@@ -3,6 +3,7 @@ import AppHeader from 'shared/layouts/AppHeader';
 import { Tabs } from 'antd';
 import PetSection from './components/PetSection';
 import CareTakerSearchSection from './components/CareTakerSearchSection';
+import axios from 'axios';
 
 const TabPane = Tabs.TabPane;
 
@@ -12,6 +13,7 @@ class DashboardPage extends Component {
     this.state = {
       pets: [],
       userId: localStorage.getItem('userId'), // Read userId from localStorage for making subsequent requests
+      userData: {},
     }
   }
 
@@ -23,7 +25,8 @@ class DashboardPage extends Component {
       userId
     });
     if (response.status === 200) {
-      userData = response.data
+      const userData = response.data
+      this.setState({ userData: userData })
     } else {
       // TODO: Show error
       console.error("Unable to retrieve user profile from Database")
@@ -56,7 +59,7 @@ class DashboardPage extends Component {
               </div>
               <div className="d-flex flex-column align-items-center mt-4">
                 <h4>Bob</h4>
-                <h4>Bob@gmail.com</h4>
+                <h4>{this.state.userId}</h4>
               </div>
             </div>
             <div className="col-8">
