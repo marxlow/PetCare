@@ -49,7 +49,7 @@ class DashboardPage extends Component {
               <Tabs type="card">
                 {/* Setting pet information */}
                 <TabPane tab="Profile" key="1">
-                  <PetSection pets={this.state.pets}/>
+                  <PetSection pets={this.state.pets} userId={this.state.userId}/>
                 </TabPane>
 
                 {/* Setting dates that each dog wants to be taken care of */}

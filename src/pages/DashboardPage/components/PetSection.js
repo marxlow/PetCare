@@ -8,14 +8,14 @@ const ListItem = List.Item;
 const ListItemMeta = ListItem.Meta;
 const petStubs = [
   {
-    nickName: 'John',
+    name: 'John',
     species: 'Dog',
     breed: 'Corgi',
     specialNote: 'Likes to poop',
     diet: 'Vegeterian',
   },
   {
-    nickName: 'Doe',
+    name: 'Doe',
     species: 'Dog',
     breed: 'Golden Retriever',
     specialNote: 'Likes to poop',
@@ -32,7 +32,7 @@ class PetSection extends Component {
     super(props);
     this.state = {
       pets: petStubs,
-      nickName: '',
+      name: '',
       species: '',
       breed: '',
       specialNote: '',
@@ -43,9 +43,9 @@ class PetSection extends Component {
     };
     // Changed to true when Add pet button is clicked
     this.submitted = false
-    this.handleNickNameChange = (e) => {
-      console.log('handleNickNameChange: ' + e.target.value);
-      this.setState({ nickName: e.target.value })
+    this.handleNameChange = (e) => {
+      console.log('handleNameChange: ' + e.target.value);
+      this.setState({ name: e.target.value })
     };
     this.handleSpeciesChange = (value, e) => {
       console.log('handleBreedChange: ' + value);
@@ -106,7 +106,7 @@ class PetSection extends Component {
   addToPets = ((event) => {
     this.submitted = true
     this.toggleSubmitted()
-    if (this.state.nickName === '' ||
+    if (this.state.name === '' ||
       this.state.species === '' ||
       // this.state.breed === '' ||
       this.state.diet === ''){
@@ -115,20 +115,20 @@ class PetSection extends Component {
       return
     }
     var newPet = {
-      nickName: this.state.nickName,
+      name: this.state.name,
       species: this.state.species,
       breed: this.state.breed,
       specialNote: this.state.specialNote,
       diet: this.state.diet
     };
     const nextPets = Object.assign([], this.state.pets);
-    // Check if there are duplicate (nickName, breed)
+    // Check if there are duplicate (name, breed)
     for (var i=0; i<nextPets.length; i++){
-      if (nextPets[i].nickName === this.state.nickName && 
+      if (nextPets[i].name === this.state.name && 
           nextPets[i].species === this.state.species && 
           nextPets[i].breed === this.state.breed ){
         this.setState({ alert: 'duplicate' })
-        console.log('Duplicated NickName, Species and Breed: ('+this.state.nickName+', '+this.state.breed+') Will not update pets');
+        console.log('Duplicated Name, Species and Breed: ('+this.state.name+', '+this.state.breed+') Will not update pets');
         return
       }
     }
@@ -169,7 +169,7 @@ class PetSection extends Component {
         // case 'duplicateName':
         //   return <Alert
         //       message="Warning"
-        //       description="There are duplicate Pets with similar nickname."
+        //       description="There are duplicate Pets with similar name."
         //       type="warning"
         //       showIcon
         //       closable
@@ -178,7 +178,7 @@ class PetSection extends Component {
         case 'duplicate':  
           return (<Alert
               message="Error"
-              description="There are duplicate Pets with similar nickname, species and breed."
+              description="There are duplicate Pets with similar name, species and breed."
               type="error"
               showIcon
               closable
@@ -191,8 +191,6 @@ class PetSection extends Component {
   };
 
   render() {
-    //const { userid } = this.props.location
-    // console.log("userid: " + userid)
     const { getFieldDecorator } = this.props.form;
 
     return (
@@ -200,11 +198,11 @@ class PetSection extends Component {
         {/* Adding new pets */}
         <Form className="d-flex flex-column" onAbort={this.handleClose}>
           <div className="d-flex w-100">
-            <FormItem className="col-5 mx-2" label="NickName">
-              {getFieldDecorator('petNickName', {
+            <FormItem className="col-5 mx-2" label="Name">
+              {getFieldDecorator('petName', {
                 rules: [{ required: true, message: 'Please input your Pet name!' }],
               })(
-                <Input onChange={this.handleNickNameChange}/>
+                <Input onChange={this.handleNameChange}/>
               )}
             </FormItem>
             <FormItem className="col-3 mx-2" label="Species">
@@ -261,7 +259,7 @@ class PetSection extends Component {
             <ListItem>
               <ListItemMeta
                 avatar={<Avatar src="https://cdn.hipwallpaper.com/m/18/64/UZMFiI.jpg" />}
-                title={`${item.nickName}, ${item.breed}`}
+                title={`${item.name}, ${item.breed}`}
                 description={`${item.diet} | ${item.specialNote}`}
               />
             </ListItem>
