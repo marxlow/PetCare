@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import AppHeader from 'shared/layouts/AppHeader';
 import { Tabs } from 'antd';
 import PetSection from './components/PetSection';
-import DateSection from './components/DateSection';
 import CareTakerSearchSection from './components/CareTakerSearchSection';
 
 const TabPane = Tabs.TabPane;
@@ -12,11 +11,13 @@ class DashboardPage extends Component {
     super(props);
     this.state = {
       pets: [],
+      userId: localStorage.getItem('userId'), // Read userId from localStorage for making subsequent requests
     }
   }
 
   onLogout = ((e) => {
     e.preventDefault();
+    localStorage.removeItem('userId'); // User is no longer logged in
     this.props.history.push('/login');
   });
 
@@ -26,6 +27,7 @@ class DashboardPage extends Component {
   });
 
   render() {
+    console.log('> logged in user is:', this.state.userId);
     return (
       <div>
         <AppHeader onLogout={this.onLogout} onSearch={this.onSearch} />
