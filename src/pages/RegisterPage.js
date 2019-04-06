@@ -40,7 +40,7 @@ class RegisterPage extends Component {
       role: this.getRole()
     });
     if (response.status === 200) {
-      console.log("Response> " + response)
+      console.log("Response> " + response.data)
       this.props.history.push('/login');
     } else {
       // TODO: Show error

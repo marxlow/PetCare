@@ -28,7 +28,13 @@ class LoginPage extends Component {
       password,
     });
     if (response.status === 200) {
-      this.props.history.push('/');
+      //Expect obj with email key
+      const userid = response.data.email
+      console.log("Response> " + userid);
+      this.props.history.push({
+        pathname: '/',  
+        userid: userid
+      });
     }
   });
 
