@@ -21,7 +21,7 @@ const petStubs = [
     specialNote: 'Likes to poop',
     diet: 'Vegeterian',
   }
-];
+]; // + this.props.pets
 
 const breedsOpt = ['No Species Specified']
 const speciesOpt = []
@@ -30,8 +30,11 @@ const speciesOpt = []
 class PetSection extends Component {
   constructor(props) {
     super(props);
+    this.pets = this.props.pets
+    this.userId = this.props.userId
     this.state = {
-      pets: petStubs,
+      userId: this.userId,
+      pets: this.pets,
       name: '',
       species: '',
       breed: '',
@@ -39,7 +42,7 @@ class PetSection extends Component {
       diet: '',
       alert: 'invisible',
       submitted: true,
-      breedsOpt: breedsOpt
+      breedsOpt: breedsOpt,
     };
     // Changed to true when Add pet button is clicked
     this.submitted = false
@@ -72,7 +75,6 @@ class PetSection extends Component {
   getSpeciesOpt = (async (event) => {
     // TODO: API call to register user
     event.preventDefault();
-    const { email, password } = this.state;
     const response = await axios.post('http://localhost:3030/petsection/', {
       post: 'getSpeciesOpt'
     });
@@ -90,7 +92,7 @@ class PetSection extends Component {
     const { species } = this.state;
     const response = await axios.post('http://localhost:3030/petsection/', {
       post: 'getBreedsOpt', 
-      species
+      species //speciesName
     });
     if (response.status === 200) {
       this.setState({ breedsOpt: response.data.breedName })
@@ -105,7 +107,7 @@ class PetSection extends Component {
       console.log('toggled submitted: '+ this.submitted)
   })
 
-  addToPets = ((event) => {
+  addToPets = (async (event) => {
     this.submitted = true
     this.toggleSubmitted()
     if (this.state.name === '' ||
@@ -141,6 +143,26 @@ class PetSection extends Component {
       alert: 'success'
     });
     console.log('Updated' + JSON.stringify(this.state.pets));
+    // Database
+    event.preventDefault();
+    const { userId } = this.state;
+    const { name, species, breed, specialNote, diet } = newPet
+    const data = {
+      email: userId,
+      name: name,
+      speciesName: species,
+      breedName: breed,
+      diet: diet,
+      specialNote: specialNote,
+    }
+    console.log("Posting data: " + JSON.stringify(data))
+    const response = await axios.post('http://localhost:3030/addpets/', data);
+    if (response.status === 200) {
+      console.log("Added pet to Database for " + this.state.userId)
+    } else {
+      // TODO: Show error
+      console.error("Unable to add pet to Database for user")
+    }
   });
 
   handleClose = (() => {
