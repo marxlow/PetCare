@@ -136,13 +136,7 @@ class PetSection extends Component {
         return
       }
     }
-    console.log('onClick Event addToPets: Adding '+ JSON.stringify(newPet));
-    nextPets.push(newPet);
-    this.setState({ 
-      pets: nextPets,
-      alert: 'success'
-    });
-    console.log('Updated' + JSON.stringify(this.state.pets));
+    console.log('Updating Pets ' + JSON.stringify(this.state.pets));
     // Database
     event.preventDefault();
     const { userId } = this.state;
@@ -157,11 +151,19 @@ class PetSection extends Component {
     }
     console.log("Posting data: " + JSON.stringify(data))
     const response = await axios.post('http://localhost:3030/addpets/', data);
+    console.log("After axios")
     if (response.status === 200) {
       console.log("Added pet to Database for " + this.state.userId)
+      console.log('onClick Event addToPets: Adding '+ JSON.stringify(newPet));
+      nextPets.push(newPet);
+      this.setState({ 
+        pets: nextPets,
+        alert: 'success'
+      });
     } else {
       // TODO: Show error
-      console.error("Unable to add pet to Database for user")
+      console.error("Unable to add pet to Database for user. Status: " + response.status )
+      this.setState({ alert: 'error' })
     }
   });
 
@@ -203,6 +205,15 @@ class PetSection extends Component {
           return (<Alert
               message="Error"
               description="There are duplicate Pets with similar name, species and breed."
+              type="error"
+              showIcon
+              closable
+              afterClose={this.handleClose}
+            />);
+        case 'error':  
+          return (<Alert
+              message="Error"
+              description="Error adding pet to database"
               type="error"
               showIcon
               closable
