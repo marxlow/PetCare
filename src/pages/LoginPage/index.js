@@ -22,12 +22,14 @@ class LoginPage extends Component {
   onSubmit = (async (event) => {
     event.preventDefault();
     const { email, password } = this.state;
-    const response = {};
+    let response = {};
+    console.log("onsubmit")
     try {
       response = await axios.post('http://localhost:3030/login/', {
         email, 
         password,
       });
+      console.log(JSON.stringify(response))
     } catch (err) {
       console.error("Unable to login. Invalid email or password. Error: " + err.message)
     }

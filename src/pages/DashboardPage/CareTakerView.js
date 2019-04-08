@@ -23,9 +23,14 @@ class CareTakerView extends Component {
   // Make API call to fetch dates
   getDatesForCareTaker = (async () => {
     // TODO: @chiasin. Make API call for all availabilities
-    // const response = await axios.get('http://localhost:3030/', {
-    // userId: this.state.userId,
-    // });
+    // let response = {}
+    // try {
+    //   response = await axios.get('http://localhost:3030/', {
+    //   userId: this.state.userId,
+    //   });
+    // } catch (err) {
+
+    // }
     const availabilityRangeStub = [
       { startDate: '2019-04-01', endDate: '2019-04-02' },
       { startDate: '2019-04-05', endDate: '2019-04-10' },
@@ -59,7 +64,7 @@ class CareTakerView extends Component {
     const { startDate, endDate } = this.state;
     console.log(startDate, endDate);
     //TODO: @chiasin. Make API call to set avilability.
-    // const response = {};
+    // let response = {};
     // try {
     //   response = await axios.post('http://localhost:3030/', {
     //     startDate,

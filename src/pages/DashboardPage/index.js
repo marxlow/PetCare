@@ -23,7 +23,7 @@ class DashboardPage extends Component {
     // TODO: API call to register user
     event.preventDefault();
     const { userId } = this.state;
-    const response = {};
+    let response = {};
     try{
       response = await axios.post('http://localhost:3030/', {
         userId
