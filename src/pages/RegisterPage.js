@@ -44,6 +44,7 @@ class RegisterPage extends Component {
       this.props.history.push('/login');
     } else {
       // TODO: Show error
+      console.error("Error creating profile. Status: " + response.status)
     }
   });
 

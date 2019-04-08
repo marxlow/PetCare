@@ -102,6 +102,11 @@ class PetSection extends Component {
     }
   });
 
+  onChangeSpecies = ((value, event) => {
+    this.handleSpeciesChange(value, event)
+    this.getBreedsOpt(event)
+  })
+
   toggleSubmitted = (() => {
     this.setState({ submitted: !this.state.submitted })
       console.log('toggled submitted: '+ this.submitted)
@@ -231,7 +236,7 @@ class PetSection extends Component {
     return (
       <div>
         {/* Adding new pets */}
-        <Form className="d-flex flex-column" onAbort={this.handleClose}>
+        <Form className="d-flex flex-column" onLoad={this.getSpeciesOpt} onAbort={this.handleClose}>
           <div className="d-flex w-100">
             <FormItem className="col-5 mx-2" label="Name">
               {getFieldDecorator('petName', {
@@ -244,7 +249,7 @@ class PetSection extends Component {
               {getFieldDecorator('speciesSelect', {
                 rules: [{ required: true, message: 'Please select a species' }],
               })(
-                <Select placeholder="Please select a species" onSelect={this.handleSpeciesChange}>
+                <Select placeholder="Please select a species" onSelect={this.onChangeSpecies}>
                   <Option value="Dog">Dog</Option>
                   <Option value="Cat">Cat</Option>
                 </Select>
