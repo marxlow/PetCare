@@ -12,14 +12,12 @@ const petStubs = [
     species: 'Dog',
     breed: 'Corgi',
     specialNote: 'Likes to poop',
-    diet: 'Vegeterian',
   },
   {
     name: 'Doe',
     species: 'Dog',
     breed: 'Golden Retriever',
     specialNote: 'Likes to poop',
-    diet: 'Vegeterian',
   }
 ]; // + this.props.pets
 
@@ -72,10 +70,29 @@ class PetSection extends Component {
     };
   }
 
+  getDietsOpt = (async (event) => {
+    // TODO: API call to register user
+    event.preventDefault();
+    let response = {};
+    try{
+      response = await axios.post('http://localhost:3030/petsection/', {
+        post: 'getDietsOpt'
+      });
+    } catch (err) {
+      console.error("Unable to retrieve diets from Database. Error: " + err.message)
+    }
+    if (response.status === 200) {
+      speciesOpt = response.data.diets
+    } else {
+      // TODO: Show error
+      console.error("Unable to retrieve diets from Database")
+    }
+  });
+
   getSpeciesOpt = (async (event) => {
     // TODO: API call to register user
     event.preventDefault();
-    const response = {};
+    let response = {};
     try{
       response = await axios.post('http://localhost:3030/petsection/', {
         post: 'getSpeciesOpt'
@@ -95,7 +112,7 @@ class PetSection extends Component {
     // TODO: API call to register user
     event.preventDefault();
     const { species } = this.state;
-    const response = {};
+    let response = {};
     try {
       response = await axios.post('http://localhost:3030/petsection/', {
         post: 'getBreedsOpt', 
@@ -156,7 +173,7 @@ class PetSection extends Component {
     event.preventDefault();
     const { userId } = this.state;
     const { name, species, breed, specialNote, diet } = newPet
-    const response = {};
+    let response = {};
     const data = {
       email: userId,
       name: name,
