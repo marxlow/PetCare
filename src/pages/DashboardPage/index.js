@@ -4,6 +4,7 @@ import { Tabs } from 'antd';
 import PetSection from './components/PetSection';
 import CareTakerSearchSection from './components/CareTakerSearchSection';
 import CareTakerView from './CareTakerView';
+import axios from 'axios';
 
 const TabPane = Tabs.TabPane;
 
@@ -14,8 +15,25 @@ class DashboardPage extends Component {
       pets: [],
       userId: localStorage.getItem('userId'), // Read userId from localStorage for making subsequent requests
       role: localStorage.getItem('role'),
+      userData: {},
     }
   }
+
+  getUserProfile = (async (event) => {
+    // TODO: API call to register user
+    event.preventDefault();
+    const { userId } = this.state;
+    const response = await axios.post('http://localhost:3030/', {
+      userId
+    });
+    if (response.status === 200) {
+      const userData = response.data
+      this.setState({ userData: userData })
+    } else {
+      // TODO: Show error
+      console.error("Unable to retrieve user profile from Database")
+    }
+  });
 
   onLogout = ((e) => {
     e.preventDefault();
@@ -43,7 +61,7 @@ class DashboardPage extends Component {
               </div>
               <div className="d-flex flex-column align-items-center mt-4">
                 <h4>Bob</h4>
-                <h4>Bob@gmail.com</h4>
+                <h4>{this.state.userId}</h4>
               </div>
             </div>
             <div className="col-8">
@@ -51,7 +69,7 @@ class DashboardPage extends Component {
                 < Tabs type="card">
                   {/* Setting pet information */}
                   <TabPane tab="Profile" key="1">
-                    <PetSection pets={this.state.pets} />
+                    <PetSection pets={this.state.pets}  userId={this.state.userId} />
                   </TabPane>
 
                   {/* Setting dates that each dog wants to be taken care of */}

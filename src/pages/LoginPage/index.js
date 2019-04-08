@@ -32,12 +32,14 @@ class LoginPage extends Component {
       localStorage.setItem('userId', userId);
 
       // TODO: Depends on role from backend. To see owner view. Comment the code below and uncomment the next.
-      localStorage.setItem('role', 'caretaker'); 
-      // localStorage.setItem('role', 'owner'); 
+      // localStorage.setItem('role', 'caretaker'); 
+      localStorage.setItem('role', 'owner'); 
 
       this.props.history.push({
         pathname: '/',  
       });
+    } else {
+      console.error("Unable to login. Invalid email or password")
     }
   });
 

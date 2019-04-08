@@ -8,20 +8,20 @@ const ListItem = List.Item;
 const ListItemMeta = ListItem.Meta;
 const petStubs = [
   {
-    nickName: 'John',
+    name: 'John',
     species: 'Dog',
     breed: 'Corgi',
     specialNote: 'Likes to poop',
     diet: 'Vegeterian',
   },
   {
-    nickName: 'Doe',
+    name: 'Doe',
     species: 'Dog',
     breed: 'Golden Retriever',
     specialNote: 'Likes to poop',
     diet: 'Vegeterian',
   }
-];
+]; // + this.props.pets
 
 const breedsOpt = ['No Species Specified']
 const speciesOpt = []
@@ -30,22 +30,25 @@ const speciesOpt = []
 class PetSection extends Component {
   constructor(props) {
     super(props);
+    this.pets = this.props.pets
+    this.userId = this.props.userId
     this.state = {
-      pets: petStubs,
-      nickName: '',
+      userId: this.userId,
+      pets: this.pets,
+      name: '',
       species: '',
       breed: '',
       specialNote: '',
       diet: '',
       alert: 'invisible',
       submitted: true,
-      breedsOpt: breedsOpt
+      breedsOpt: breedsOpt,
     };
     // Changed to true when Add pet button is clicked
     this.submitted = false
-    this.handleNickNameChange = (e) => {
-      console.log('handleNickNameChange: ' + e.target.value);
-      this.setState({ nickName: e.target.value })
+    this.handleNameChange = (e) => {
+      console.log('handleNameChange: ' + e.target.value);
+      this.setState({ name: e.target.value })
     };
     this.handleSpeciesChange = (value, e) => {
       console.log('handleBreedChange: ' + value);
@@ -72,14 +75,14 @@ class PetSection extends Component {
   getSpeciesOpt = (async (event) => {
     // TODO: API call to register user
     event.preventDefault();
-    const { email, password } = this.state;
     const response = await axios.post('http://localhost:3030/petsection/', {
       post: 'getSpeciesOpt'
     });
     if (response.status === 200) {
-      speciesOpt = response.status
+      speciesOpt = response.data.speciesName
     } else {
       // TODO: Show error
+      console.error("Unable to retrieve species from Database")
     }
   });
 
@@ -89,12 +92,13 @@ class PetSection extends Component {
     const { species } = this.state;
     const response = await axios.post('http://localhost:3030/petsection/', {
       post: 'getBreedsOpt', 
-      species
+      species //speciesName
     });
     if (response.status === 200) {
-      this.setState({ breedsOpt: response.status })
+      this.setState({ breedsOpt: response.data.breedName })
     } else {
       // TODO: Show error
+      console.error("Unable to retrieve breeds from Database for chosen species")
     }
   });
 
@@ -103,10 +107,10 @@ class PetSection extends Component {
       console.log('toggled submitted: '+ this.submitted)
   })
 
-  addToPets = ((event) => {
+  addToPets = (async (event) => {
     this.submitted = true
     this.toggleSubmitted()
-    if (this.state.nickName === '' ||
+    if (this.state.name === '' ||
       this.state.species === '' ||
       // this.state.breed === '' ||
       this.state.diet === ''){
@@ -115,30 +119,52 @@ class PetSection extends Component {
       return
     }
     var newPet = {
-      nickName: this.state.nickName,
+      name: this.state.name,
       species: this.state.species,
       breed: this.state.breed,
       specialNote: this.state.specialNote,
       diet: this.state.diet
     };
     const nextPets = Object.assign([], this.state.pets);
-    // Check if there are duplicate (nickName, breed)
+    // Check if there are duplicate (name, breed)
     for (var i=0; i<nextPets.length; i++){
-      if (nextPets[i].nickName === this.state.nickName && 
+      if (nextPets[i].name === this.state.name && 
           nextPets[i].species === this.state.species && 
           nextPets[i].breed === this.state.breed ){
         this.setState({ alert: 'duplicate' })
-        console.log('Duplicated NickName, Species and Breed: ('+this.state.nickName+', '+this.state.breed+') Will not update pets');
+        console.log('Duplicated Name, Species and Breed: ('+this.state.name+', '+this.state.breed+') Will not update pets');
         return
       }
     }
-    console.log('onClick Event addToPets: Adding '+ JSON.stringify(newPet));
-    nextPets.push(newPet);
-    this.setState({ 
-      pets: nextPets,
-      alert: 'success'
-    });
-    console.log('Updated' + JSON.stringify(this.state.pets));
+    console.log('Updating Pets ' + JSON.stringify(this.state.pets));
+    // Database
+    event.preventDefault();
+    const { userId } = this.state;
+    const { name, species, breed, specialNote, diet } = newPet
+    const data = {
+      email: userId,
+      name: name,
+      speciesName: species,
+      breedName: breed,
+      diet: diet,
+      specialNote: specialNote,
+    }
+    console.log("Posting data: " + JSON.stringify(data))
+    const response = await axios.post('http://localhost:3030/addpets/', data);
+    console.log("After axios")
+    if (response.status === 200) {
+      console.log("Added pet to Database for " + this.state.userId)
+      console.log('onClick Event addToPets: Adding '+ JSON.stringify(newPet));
+      nextPets.push(newPet);
+      this.setState({ 
+        pets: nextPets,
+        alert: 'success'
+      });
+    } else {
+      // TODO: Show error
+      console.error("Unable to add pet to Database for user. Status: " + response.status )
+      this.setState({ alert: 'error' })
+    }
   });
 
   handleClose = (() => {
@@ -169,7 +195,7 @@ class PetSection extends Component {
         // case 'duplicateName':
         //   return <Alert
         //       message="Warning"
-        //       description="There are duplicate Pets with similar nickname."
+        //       description="There are duplicate Pets with similar name."
         //       type="warning"
         //       showIcon
         //       closable
@@ -178,7 +204,16 @@ class PetSection extends Component {
         case 'duplicate':  
           return (<Alert
               message="Error"
-              description="There are duplicate Pets with similar nickname, species and breed."
+              description="There are duplicate Pets with similar name, species and breed."
+              type="error"
+              showIcon
+              closable
+              afterClose={this.handleClose}
+            />);
+        case 'error':  
+          return (<Alert
+              message="Error"
+              description="Error adding pet to database"
               type="error"
               showIcon
               closable
@@ -191,8 +226,6 @@ class PetSection extends Component {
   };
 
   render() {
-    //const { userid } = this.props.location
-    // console.log("userid: " + userid)
     const { getFieldDecorator } = this.props.form;
 
     return (
@@ -200,11 +233,11 @@ class PetSection extends Component {
         {/* Adding new pets */}
         <Form className="d-flex flex-column" onAbort={this.handleClose}>
           <div className="d-flex w-100">
-            <FormItem className="col-5 mx-2" label="NickName">
-              {getFieldDecorator('petNickName', {
+            <FormItem className="col-5 mx-2" label="Name">
+              {getFieldDecorator('petName', {
                 rules: [{ required: true, message: 'Please input your Pet name!' }],
               })(
-                <Input onChange={this.handleNickNameChange}/>
+                <Input onChange={this.handleNameChange}/>
               )}
             </FormItem>
             <FormItem className="col-3 mx-2" label="Species">
@@ -261,7 +294,7 @@ class PetSection extends Component {
             <ListItem>
               <ListItemMeta
                 avatar={<Avatar src="https://cdn.hipwallpaper.com/m/18/64/UZMFiI.jpg" />}
-                title={`${item.nickName}, ${item.breed}`}
+                title={`${item.name}, ${item.breed}`}
                 description={`${item.diet} | ${item.specialNote}`}
               />
             </ListItem>
