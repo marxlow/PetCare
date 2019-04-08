@@ -7,6 +7,7 @@ class RegisterPage extends Component {
     super(props);
     this.state = {
       email: '',
+      name: '',
       password: '',
       options: [{ role: 'Pet Owner', chosen: true }, { role: 'Care Taker', chosen: false }]
     };
@@ -14,6 +15,10 @@ class RegisterPage extends Component {
 
   updateEmail = ((event) => {
     this.setState({ email: event.target.value });
+  });
+
+  updateName = ((event) => {
+    this.setState({ name: event.target.value });
   });
 
   updatePassword = ((event) => {
@@ -33,11 +38,12 @@ class RegisterPage extends Component {
   onSubmit = (async (event) => {
     // TODO: API call to register user
     event.preventDefault();
-    const { email, password } = this.state;
+    const { email, name, password } = this.state;
     const response = {};
     try {
       response = await axios.post('http://localhost:3030/register/', {
         email,
+        name,
         password,
         role: this.getRole()
       });
@@ -77,6 +83,10 @@ class RegisterPage extends Component {
                 <label for="inputEmail">Email address</label>
                 <input type="email" className="form-control" id="inputEmail" aria-describedby="emailHelp" placeholder="Enter email" onChange={this.updateEmail} />
                 <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small>
+              </div>
+              <div className="form-group">
+                <label for="inputName">Name</label>
+                <input type="email" className="form-control" id="inputName" placeholder="Name" onChange={this.updateName} />
               </div>
               <div className="form-group">
                 <label for="inputPassword">Password</label>
