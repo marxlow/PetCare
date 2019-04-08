@@ -16,7 +16,7 @@ class DateSection extends Component {
   render(){
     return(
       <div className="d-flex flex-column">
-        <span className="my-4">Select a date range for all your pets to be taken care of</span>
+        <span className="my-4">{this.props.title}</span>
         <RangePicker className="col-6" onChange={this.onChange}/>
       </div>
     )
