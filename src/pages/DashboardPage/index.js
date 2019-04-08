@@ -26,7 +26,7 @@ class DashboardPage extends Component {
     let response = {};
     try{
       response = await axios.post('http://localhost:3030/', {
-        userId
+        email: userId
       });
     } catch (err) {
       console.error("Unable to retrieve user profile from Database")

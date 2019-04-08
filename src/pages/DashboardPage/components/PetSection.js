@@ -146,7 +146,7 @@ class PetSection extends Component {
       this.state.species === '' ||
       // this.state.breed === '' ||
       this.state.diet === ''){
-        this.setState({ alert: 'empty' })
+      this.setState({ alert: 'empty' })
       console.log('Empty fields: Will not update pets');
       return
     }
@@ -175,6 +175,7 @@ class PetSection extends Component {
     const { name, species, breed, specialNote, diet } = newPet
     let response = {};
     const data = {
+      post: 'addPets',
       email: userId,
       name: name,
       speciesName: species,
@@ -184,10 +185,11 @@ class PetSection extends Component {
     }
     console.log("Posting data: " + JSON.stringify(data))
     try {
-      response = await axios.post('http://localhost:3030/addpets/', data);
+      response = await axios.post('http://localhost:3030/petsection/', data);
     } catch (err) {
       console.error("Unable to add pet to Database for user. Error: " + err.message )
       this.setState({ alert: 'error' })
+      return
     }
     if (response.status === 200) {
       console.log("Added pet to Database for " + this.state.userId)
