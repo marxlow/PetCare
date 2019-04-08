@@ -30,6 +30,11 @@ class LoginPage extends Component {
       const userId = response.data.email;
       // Write userId to localStorage. Think of local storage as a global class that all components have access to.
       localStorage.setItem('userId', userId);
+
+      // TODO: Depends on role from backend. To see owner view. Comment the code below and uncomment the next.
+      // localStorage.setItem('role', 'caretaker'); 
+      localStorage.setItem('role', 'owner'); 
+
       this.props.history.push({
         pathname: '/',  
       });
