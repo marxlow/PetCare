@@ -21,9 +21,7 @@ const petStubs = [
   }
 ]; // + this.props.pets
 
-const breedsOpt = ['No Species Specified']
-const speciesOpt = []
-
+let breedsOpt = ['No Species Specified']
 
 class PetSection extends Component {
   constructor(props) {
@@ -41,6 +39,8 @@ class PetSection extends Component {
       alert: 'invisible',
       submitted: true,
       breedsOpt: breedsOpt,
+      speciesOpt: [],
+      dietsOpt: [],
     };
     // Changed to true when Add pet button is clicked
     this.submitted = false
@@ -72,17 +72,20 @@ class PetSection extends Component {
 
   getDietsOpt = (async (event) => {
     // TODO: API call to register user
-    event.preventDefault();
+    // event.preventDefault();
     let response = {};
     try{
       response = await axios.post('http://localhost:3030/petsection/', {
-        post: 'getDietsOpt'
+        post: 'getAllDiets'
       });
     } catch (err) {
-      console.error("Unable to retrieve diets from Database. Error: " + err.message)
+      console.error("Unable to retrieve diets from Database. Error: " + err.response.data)
     }
     if (response.status === 200) {
-      speciesOpt = response.data.diets
+      let dietsOpt = response.data.rows    
+      console.log("GET Diets: " + dietsOpt)
+      this.setState({ dietsOpt: dietsOpt })
+      console.log("GET Diets: " + dietsOpt[0].diet)
     } else {
       // TODO: Show error
       console.error("Unable to retrieve diets from Database")
@@ -91,17 +94,20 @@ class PetSection extends Component {
 
   getSpeciesOpt = (async (event) => {
     // TODO: API call to register user
-    event.preventDefault();
+    // event.preventDefault();
     let response = {};
     try{
       response = await axios.post('http://localhost:3030/petsection/', {
-        post: 'getSpeciesOpt'
+        post: 'getAllSpecies'
       });
     } catch (err) {
-      console.error("Unable to retrieve species from Database. Error: " + err.message)
+      console.error("Unable to retrieve species from Database. Error: " + err.response.data)
     }
     if (response.status === 200) {
-      speciesOpt = response.data.speciesName
+      let speciesOpt = response.data.rows
+      console.log("GET Species: " + speciesOpt)
+      this.setState({ speciesOpt: speciesOpt })
+      console.log("GET Species: " + speciesOpt[0].speciesname)
     } else {
       // TODO: Show error
       console.error("Unable to retrieve species from Database")
@@ -110,19 +116,21 @@ class PetSection extends Component {
 
   getBreedsOpt = (async (event) => {
     // TODO: API call to register user
-    event.preventDefault();
+    // event.preventDefault(); 
     const { species } = this.state;
     let response = {};
     try {
       response = await axios.post('http://localhost:3030/petsection/', {
-        post: 'getBreedsOpt', 
-        species //speciesName
+        post: 'getAllBreeds', 
+        speciesName: species
       });
     } catch (err) {
-      console.error("Unable to retrieve breeds from Database for chosen species. Error: " + err.message)
+      console.error("Unable to retrieve breeds from Database for chosen species. Error: " + err.response.data)
     }
     if (response.status === 200) {
-      this.setState({ breedsOpt: response.data.breedName })
+      this.setState({ breedsOpt: response.data.rows })
+      console.log("GET Breeds: " + response.data.rows)
+      console.log("GET Breeds: " + response.data.rows[0].breedname)
     } else {
       // TODO: Show error
       console.error("Unable to retrieve breeds from Database for chosen species")
@@ -130,9 +138,15 @@ class PetSection extends Component {
   });
 
   onChangeSpecies = ((value, event) => {
-    this.handleSpeciesChange(value, event)
-    this.getBreedsOpt(event)
+    this.handleSpeciesChange(value, event);
+    this.getBreedsOpt(event);
   })
+
+  loadSpeciesDiet = ((event) => {
+    console.log("On Load PetSection")
+    this.getDietsOpt(event);
+    this.getSpeciesOpt(event);
+  });
 
   toggleSubmitted = (() => {
     this.setState({ submitted: !this.state.submitted })
@@ -187,7 +201,7 @@ class PetSection extends Component {
     try {
       response = await axios.post('http://localhost:3030/petsection/', data);
     } catch (err) {
-      console.error("Unable to add pet to Database for user. Error: " + err.message )
+      console.error("Unable to add pet to Database for user. Error: " + err.response.data)
       this.setState({ alert: 'error' })
       return
     }
@@ -268,9 +282,8 @@ class PetSection extends Component {
     const { getFieldDecorator } = this.props.form;
 
     return (
-      <div>
+      <div onLoad={this.loadSpeciesDiet}>
         {/* Adding new pets */}
-        {/* <Form className="d-flex flex-column" onLoad={this.getSpeciesOpt} onAbort={this.handleClose}> */}
         <Form className="d-flex flex-column" onAbort={this.handleClose}>
           <div className="d-flex w-100">
             <FormItem className="col-5 mx-2" label="Name">
@@ -284,9 +297,13 @@ class PetSection extends Component {
               {getFieldDecorator('speciesSelect', {
                 rules: [{ required: true, message: 'Please select a species' }],
               })(
-                <Select placeholder="Please select a species" onSelect={this.handleSpeciesChange}>
-                  <Option value="Dog">Dog</Option>
-                  <Option value="Cat">Cat</Option>
+                <Select placeholder="Please select a species" onSelect={this.onChangeSpecies}
+                  dataSource={this.state.speciesOpt}
+                  renderItem={item => (
+                    <Option value={item.speciesname}>{item}</Option>
+                  )}>
+                  {/* <Option value="Dog">Dog</Option>
+                  <Option value="Cat">Cat</Option> */}
                 </Select>
               )}
             </FormItem>
@@ -294,9 +311,13 @@ class PetSection extends Component {
               {getFieldDecorator('breedSelect', {
                 rules: [{ required: true, message: 'Please select a breed' }],
               })(
-                <Select placeholder="Please select a breed" onSelect={this.handleBreedChange}>
-                  <Option value="Golden Retriever">Golden Retriever</Option>
-                  <Option value="Corgi">Corgi</Option>
+                <Select placeholder="Please select a breed" onSelect={this.handleBreedChange}
+                  dataSource={this.state.breedsOpt}
+                  renderItem={item => (
+                    <Option value={item.breedname}>{item}</Option>
+                  )}>
+                  {/* <Option value="Golden Retriever">Golden Retriever</Option>
+                  <Option value="Corgi">Corgi</Option> */}
                 </Select>
               )}
             </FormItem>
@@ -306,10 +327,14 @@ class PetSection extends Component {
               {getFieldDecorator('dietSelect', {
                 rules: [{ required: true, message: 'Please select a diet' }],
               })(
-                <Select placeholder="Please select a diet" onSelect={this.handleDietChange}>
-                  <Option value="Vegetarian">Vegetarian</Option>
+                <Select placeholder="Please select a diet" onSelect={this.handleDietChange}
+                  dataSource={this.state.dietsOpt}
+                  renderItem={item => (
+                    <Option value={item.diet}>{item.diet}</Option>
+                  )}>
+                  {/* <Option value="Vegetarian">Vegetarian</Option>
                   <Option value="Carnivore">Carnivore</Option>
-                  <Option value="Gluten-free">Gluten-free</Option>
+                  <Option value="Gluten-free">Gluten-free</Option> */}
                 </Select>
               )}
             </FormItem>

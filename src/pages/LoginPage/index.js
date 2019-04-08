@@ -29,9 +29,9 @@ class LoginPage extends Component {
         email, 
         password,
       });
-      console.log(JSON.stringify(response))
+      // console.log(JSON.stringify(response.data))
     } catch (err) {
-      console.error("Unable to login. Invalid email or password. Error: " + err.message)
+      console.error("Unable to login. Invalid email or password. Error: " + err.response.data)
     }
     if (response.status === 200) {
       const userId = response.data.email;

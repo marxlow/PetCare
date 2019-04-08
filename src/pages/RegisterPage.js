@@ -17,6 +17,7 @@ class RegisterPage extends Component {
       alert: 'invisible',
       submitted: true
     };
+    // Changed to true when Register button is clicked
     this.submitted = false;
   }
 
