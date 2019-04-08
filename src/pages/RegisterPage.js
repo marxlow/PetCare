@@ -34,11 +34,16 @@ class RegisterPage extends Component {
     // TODO: API call to register user
     event.preventDefault();
     const { email, password } = this.state;
-    const response = await axios.post('http://localhost:3030/register/', {
-      email,
-      password,
-      role: this.getRole()
-    });
+    const response = {};
+    try {
+      response = await axios.post('http://localhost:3030/register/', {
+        email,
+        password,
+        role: this.getRole()
+      });
+    } catch (err) {
+      console.error("Error creating profile. Error: " + err.message)
+    }
     if (response.status === 200) {
       console.log("Response> " + response.data)
       this.props.history.push('/login');

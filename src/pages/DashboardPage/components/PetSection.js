@@ -75,9 +75,14 @@ class PetSection extends Component {
   getSpeciesOpt = (async (event) => {
     // TODO: API call to register user
     event.preventDefault();
-    const response = await axios.post('http://localhost:3030/petsection/', {
-      post: 'getSpeciesOpt'
-    });
+    const response = {};
+    try{
+      response = await axios.post('http://localhost:3030/petsection/', {
+        post: 'getSpeciesOpt'
+      });
+    } catch (err) {
+      console.error("Unable to retrieve species from Database. Error: " + err.message)
+    }
     if (response.status === 200) {
       speciesOpt = response.data.speciesName
     } else {
@@ -90,10 +95,15 @@ class PetSection extends Component {
     // TODO: API call to register user
     event.preventDefault();
     const { species } = this.state;
-    const response = await axios.post('http://localhost:3030/petsection/', {
-      post: 'getBreedsOpt', 
-      species //speciesName
-    });
+    const response = {};
+    try {
+      response = await axios.post('http://localhost:3030/petsection/', {
+        post: 'getBreedsOpt', 
+        species //speciesName
+      });
+    } catch (err) {
+      console.error("Unable to retrieve breeds from Database for chosen species. Error: " + err.message)
+    }
     if (response.status === 200) {
       this.setState({ breedsOpt: response.data.breedName })
     } else {
@@ -146,6 +156,7 @@ class PetSection extends Component {
     event.preventDefault();
     const { userId } = this.state;
     const { name, species, breed, specialNote, diet } = newPet
+    const response = {};
     const data = {
       email: userId,
       name: name,
@@ -155,8 +166,12 @@ class PetSection extends Component {
       specialNote: specialNote,
     }
     console.log("Posting data: " + JSON.stringify(data))
-    const response = await axios.post('http://localhost:3030/addpets/', data);
-    console.log("After axios")
+    try {
+      response = await axios.post('http://localhost:3030/addpets/', data);
+    } catch (err) {
+      console.error("Unable to add pet to Database for user. Error: " + err.message )
+      this.setState({ alert: 'error' })
+    }
     if (response.status === 200) {
       console.log("Added pet to Database for " + this.state.userId)
       console.log('onClick Event addToPets: Adding '+ JSON.stringify(newPet));
@@ -236,7 +251,8 @@ class PetSection extends Component {
     return (
       <div>
         {/* Adding new pets */}
-        <Form className="d-flex flex-column" onLoad={this.getSpeciesOpt} onAbort={this.handleClose}>
+        {/* <Form className="d-flex flex-column" onLoad={this.getSpeciesOpt} onAbort={this.handleClose}> */}
+        <Form className="d-flex flex-column" onAbort={this.handleClose}>
           <div className="d-flex w-100">
             <FormItem className="col-5 mx-2" label="Name">
               {getFieldDecorator('petName', {
@@ -249,7 +265,7 @@ class PetSection extends Component {
               {getFieldDecorator('speciesSelect', {
                 rules: [{ required: true, message: 'Please select a species' }],
               })(
-                <Select placeholder="Please select a species" onSelect={this.onChangeSpecies}>
+                <Select placeholder="Please select a species" onSelect={this.handleSpeciesChange}>
                   <Option value="Dog">Dog</Option>
                   <Option value="Cat">Cat</Option>
                 </Select>

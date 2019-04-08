@@ -22,10 +22,15 @@ class LoginPage extends Component {
   onSubmit = (async (event) => {
     event.preventDefault();
     const { email, password } = this.state;
-    const response = await axios.post('http://localhost:3030/login/', {
-      email, 
-      password,
-    });
+    const response = {};
+    try {
+      response = await axios.post('http://localhost:3030/login/', {
+        email, 
+        password,
+      });
+    } catch (err) {
+      console.error("Unable to login. Invalid email or password. Error: " + err.message)
+    }
     if (response.status === 200) {
       const userId = response.data.email;
       // Write userId to localStorage. Think of local storage as a global class that all components have access to.

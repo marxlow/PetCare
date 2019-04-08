@@ -58,12 +58,17 @@ class CareTakerView extends Component {
   setAvailbilityForCareTaker = (async () => {
     const { startDate, endDate } = this.state;
     console.log(startDate, endDate);
-    // TODO: @chiasin. Make API call to set avilability.
-    // const response = await axios.post('http://localhost:3030/', {
-    //   startDate,
-    //   endDate,
-    //   userId: this.state.userId
-    // });
+    //TODO: @chiasin. Make API call to set avilability.
+    // const response = {};
+    // try {
+    //   response = await axios.post('http://localhost:3030/', {
+    //     startDate,
+    //     endDate,
+    //     userId: this.state.userId
+    //   });
+    // } catch (err) {
+    //   console.log("STUB")
+    // }
     
     // TODO: @chiasin. Refresh availbilities.
     // await this.getDatesForCareTaker();

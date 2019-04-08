@@ -23,9 +23,14 @@ class DashboardPage extends Component {
     // TODO: API call to register user
     event.preventDefault();
     const { userId } = this.state;
-    const response = await axios.post('http://localhost:3030/', {
-      userId
-    });
+    const response = {};
+    try{
+      response = await axios.post('http://localhost:3030/', {
+        userId
+      });
+    } catch (err) {
+      console.error("Unable to retrieve user profile from Database")
+    }
     if (response.status === 200) {
       const userData = response.data
       this.setState({ userData: userData })
