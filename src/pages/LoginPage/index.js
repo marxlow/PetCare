@@ -33,9 +33,9 @@ class LoginPage extends Component {
         // Update local storage with role
         localStorage.setItem('userId', userId); 
         if (response.data.petowner) {
-          localStorage.setItem('role', 'owner');
+          localStorage.setItem('role', 'Pet Owner');
         } else {
-          localStorage.setItem('role', 'careTaker');
+          localStorage.setItem('role', 'Care Taker');
         }
         this.props.history.push({
           pathname: '/',  

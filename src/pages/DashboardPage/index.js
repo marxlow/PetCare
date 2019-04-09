@@ -110,7 +110,7 @@ class DashboardPage extends Component {
               </div>
             </div>
             <div className="col-8">
-              {role === 'owner' ?
+              {role === 'Pet Owner' ?
                 <PetOwnerView userId={userId} />
                 :
                 <CareTakerView userId={userId} />
