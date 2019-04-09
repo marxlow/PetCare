@@ -1,27 +1,16 @@
 import React, { Component } from 'react';
 import AppHeader from 'shared/layouts/AppHeader';
-import { Tabs } from 'antd';
-import PetSection from './components/PetSection';
-import CareTakerSearchSection from './components/CareTakerSearchSection';
+import PetOwnerView from './PetOwnerView';
 import CareTakerView from './CareTakerView';
-import axios from 'axios';
-
-const TabPane = Tabs.TabPane;
 
 class DashboardPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      pets: [],
       userId: localStorage.getItem('userId'), // Read userId from localStorage for making subsequent requests
       role: localStorage.getItem('role'),
       userData: {},
     }
-  }
-
-  // When component firsts load. Fetch that DashBoard supports
-  async componentDidMount() {
-
   }
 
   onLogout = ((e) => {
@@ -36,7 +25,7 @@ class DashboardPage extends Component {
   });
 
   render() {
-    const { userId, role, pets } = this.state;
+    const { userId, role } = this.state;
     if (!localStorage.getItem('role') || role === null) {
       localStorage.clear(); // Remove all key/value pair in localstorage
       this.props.history.push('/login');
@@ -59,24 +48,9 @@ class DashboardPage extends Component {
             </div>
             <div className="col-8">
               {role === 'owner' ?
-                < Tabs type="card">
-                  {/* Setting pet information */}
-                  <TabPane tab="Profile" key="1">
-                    <PetSection pets={pets} userId={userId} />
-                  </TabPane>
-
-                  {/* Setting dates that each dog wants to be taken care of */}
-                  {/* <TabPane tab="Dates" key="2">
-                  <DateSection title="Select a date range for all your pets to be taken care of"/>
-                </TabPane> */}
-
-                  {/* Searching & Bidding for care takers */}
-                  <TabPane tab="Search" key="3">
-                    <CareTakerSearchSection />
-                  </TabPane>
-                </Tabs>
+                <PetOwnerView userId={userId} />
                 :
-                <CareTakerView />
+                <CareTakerView userId={userId} />
               }
             </div>
           </div>
