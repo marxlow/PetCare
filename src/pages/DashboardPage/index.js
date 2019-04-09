@@ -1,49 +1,17 @@
 import React, { Component } from 'react';
 import AppHeader from 'shared/layouts/AppHeader';
-import { Tabs } from 'antd';
-import PetSection from './components/PetSection';
-import CareTakerSearchSection from './components/CareTakerSearchSection';
+import PetOwnerView from './PetOwnerView';
 import CareTakerView from './CareTakerView';
-import axios from 'axios';
-
-const TabPane = Tabs.TabPane;
 
 class DashboardPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      pets: [],
       userId: localStorage.getItem('userId'), // Read userId from localStorage for making subsequent requests
       role: localStorage.getItem('role'),
       userData: {},
     }
   }
-
-  // When component firsts load. Fetch that DashBoard supports
-  async componentDidMount() {
-
-  }
-  
-  getUserProfile = (async (event) => {
-    // TODO: API call to register user
-    event.preventDefault();
-    const { userId, role } = this.state;
-    let response = {};
-    try{
-      response = await axios.post('http://localhost:3030/', {
-        email: userId
-      });
-    } catch (err) {
-      console.error("Unable to retrieve user profile from Database")
-    }
-    if (response.status === 200) {
-      const userData = response.data
-      this.setState({ userData: userData })
-    } else {
-      // TODO: Show error
-      console.error("Unable to retrieve user profile from Database")
-    }
-  });
 
   onLogout = ((e) => {
     e.preventDefault();
@@ -58,7 +26,6 @@ class DashboardPage extends Component {
 
   render() {
     const { userId, role, pets } = this.state;
-    console.log("Role:", JSON.stringify(role), JSON.stringify(localStorage.getItem('role')));
     if ( !localStorage.getItem('role') || role === null ){
       localStorage.clear(); // Remove all key/value pair in localstorage
       this.props.history.push('/login');
@@ -81,31 +48,10 @@ class DashboardPage extends Component {
               </div>
             </div>
             <div className="col-8">
-              {role.petowner === true ?
-                < Tabs type="card">
-                  {/* Setting pet information */}
-                  <TabPane tab="Profile" key="1">
-                    <PetSection pets={pets}  userId={userId} />
-                  </TabPane>
-
-                  {/* Setting dates that each dog wants to be taken care of */}
-                  {/* <TabPane tab="Dates" key="2">
-                  <DateSection title="Select a date range for all your pets to be taken care of"/>
-                </TabPane> */}
-
-                  {/* Searching & Bidding for care takers */}
-                  <TabPane tab="Search" key="3">
-                    <CareTakerSearchSection />
-                  </TabPane>
-                </Tabs>
+              {role === 'owner' ?
+                <PetOwnerView userId={userId} />
                 :
-                < Tabs type="card">
-                  {/* Setting pet information */}
-                  <TabPane tab="Profile" key="1">
-                    <CareTakerView />
-                  </TabPane>
-                  {/* Searching & Bidding for care takers */}
-                </Tabs>
+                <CareTakerView userId={userId} />
               }
             </div>
           </div>

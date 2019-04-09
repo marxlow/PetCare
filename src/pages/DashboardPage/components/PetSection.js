@@ -63,7 +63,8 @@ class PetSection extends Component {
     }
   })
 
-  // When component firsts load. Fetch species & diets that PetCare supports
+  // When component firsts load. 
+  // Fetch species & diets that PetCare supports.
   async componentDidMount() {
     try {
       // Fetch diets & species
@@ -121,48 +122,8 @@ class PetSection extends Component {
     }
   });
 
-  deletePet = (async (event) => {
-    const nextPets = Object.assign([], this.state.pets);
+  deletePet = (async (pid) => {
     const { userId } = this.state;
-    const { pid } = this.state;
-    let response = {};
-    try {
-      response = await axios.post('http://localhost:3030/petsection/', {
-        pid
-      });
-    } catch (err) {
-      console.error("Unable to delete pet to Database for user. Error: " + err.response.data)
-      this.setState({ alert: 'error' })
-      return
-    }
-    if (response.status === 200) {
-      let oldPet = {};
-      let delIdx = -1;
-      for (var i = 0; i < nextPets.length; i++) {
-        if (nextPets[i].pid === pid) {
-          oldPet = nextPets[i];
-          delIdx = i;
-          break;
-        }
-      }
-      console.log("Deleting pet from Database for " + userId)
-      //Pet with pid not found
-      if (delIdx === -1 || oldPet === {}) {
-        console.log("Unable to delete pet from state")
-      } else {
-        console.log('onClick Event deletePet: Deleting ' + JSON.stringify(oldPet));
-        nextPets.splice(delIdx, 1);
-        this.setState({
-          pets: nextPets,
-          alert: 'success'
-        });
-      }
-      this.setState({ alert: 'success' });
-    } else {
-      // TODO: Show error
-      console.error("Unable to add pet to Database for user. Status: " + response.status)
-      this.setState({ alert: 'error' })
-    }
   });
 
   // Closing of Alert
@@ -319,10 +280,11 @@ class PetSection extends Component {
           renderItem={item => (
             <ListItem>
               <ListItemMeta
-                avatar={<Avatar src="https://cdn.hipwallpaper.com/m/18/64/UZMFiI.jpg" />}
+                avatar={<Avatar src="http://adventuretimeforum.com/jakehead.png" />}
                 title={`${item.name}, ${item.breed}`}
                 description={`${item.diet} | ${item.specialNote}`}
               />
+              <Button icon="delete" onClick={(() => this.deletePet(item.pid))}>Delete Pet</Button>
             </ListItem>
           )}
         />
