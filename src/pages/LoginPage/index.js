@@ -23,37 +23,28 @@ class LoginPage extends Component {
   onSubmit = (async (event) => {
     event.preventDefault();
     const { email, password } = this.state;
-    let response = {};
     try {
-      response = await axios.post('http://localhost:3030/login/', {
+      const response = await axios.post('http://localhost:3030/login/', {
         email, 
         password,
       });
-      // console.log(JSON.stringify(response.data))
+      if (response.status === 200) {
+        const userId = response.data.email;
+        // Update local storage with role
+        localStorage.setItem('userId', userId); 
+        if (response.data.petowner) {
+          localStorage.setItem('role', 'owner');
+        } else {
+          localStorage.setItem('role', 'careTaker');
+        }
+        this.props.history.push({
+          pathname: '/',  
+        });
+      }
     } catch (err) {
-      console.error("Unable to login. Invalid email or password. Error: " + err.response.data)
-      message.warn("Invalid email or password")
-      return
-    }
-    if (response.status === 200) {
-      console.log("Login as " + JSON.stringify(response.data))
-      const userId = response.data.email;
-      const role = { petowner: response.data.petowner, caretaker: response.data.caretaker }
-      
-      // Write userId to localStorage. Think of local storage as a global class that all components have access to.
-      localStorage.setItem('userId', userId); 
-
-      // TODO: Depends on role from backend. To see owner view. Comment the code below and uncomment the next.
-      // localStorage.setItem('role', 'caretaker'); 
-      // localStorage.setItem('role', 'owner');
-      localStorage.setItem('role', role); 
-
-      this.props.history.push({
-        pathname: '/',  
-      });
-    } else {
-      console.error("Unable to login. Invalid email or password")
-      message.warn("Invalid email or password")
+      console.error("Unable to login. Invalid email or password. Error: " + err.message);
+      message.warn("Invalid email or password");
+      return;
     }
   });
 

@@ -23,27 +23,6 @@ class DashboardPage extends Component {
   async componentDidMount() {
 
   }
-  
-  getUserProfile = (async (event) => {
-    // TODO: API call to register user
-    event.preventDefault();
-    const { userId, role } = this.state;
-    let response = {};
-    try{
-      response = await axios.post('http://localhost:3030/', {
-        email: userId
-      });
-    } catch (err) {
-      console.error("Unable to retrieve user profile from Database")
-    }
-    if (response.status === 200) {
-      const userData = response.data
-      this.setState({ userData: userData })
-    } else {
-      // TODO: Show error
-      console.error("Unable to retrieve user profile from Database")
-    }
-  });
 
   onLogout = ((e) => {
     e.preventDefault();
@@ -58,7 +37,7 @@ class DashboardPage extends Component {
 
   render() {
     const { userId, role, pets } = this.state;
-    if ( !localStorage.getItem('role') || role === null ){
+    if (!localStorage.getItem('role') || role === null) {
       localStorage.clear(); // Remove all key/value pair in localstorage
       this.props.history.push('/login');
     }
@@ -79,11 +58,11 @@ class DashboardPage extends Component {
               </div>
             </div>
             <div className="col-8">
-              {role.petowner ?
+              {role === 'owner' ?
                 < Tabs type="card">
                   {/* Setting pet information */}
                   <TabPane tab="Profile" key="1">
-                    <PetSection pets={pets}  userId={userId} />
+                    <PetSection pets={pets} userId={userId} />
                   </TabPane>
 
                   {/* Setting dates that each dog wants to be taken care of */}
