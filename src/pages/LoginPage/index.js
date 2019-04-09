@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import SplitLayout from 'shared/layouts/SplitLayout';
 import axios from 'axios';
+import { message } from 'antd';
 
 class LoginPage extends Component {
   constructor(props) {
@@ -23,7 +24,6 @@ class LoginPage extends Component {
     event.preventDefault();
     const { email, password } = this.state;
     let response = {};
-    console.log("onsubmit")
     try {
       response = await axios.post('http://localhost:3030/login/', {
         email, 
@@ -32,6 +32,8 @@ class LoginPage extends Component {
       // console.log(JSON.stringify(response.data))
     } catch (err) {
       console.error("Unable to login. Invalid email or password. Error: " + err.response.data)
+      message.warn("Invalid email or password")
+      return
     }
     if (response.status === 200) {
       console.log("Login as " + JSON.stringify(response.data))
@@ -51,6 +53,7 @@ class LoginPage extends Component {
       });
     } else {
       console.error("Unable to login. Invalid email or password")
+      message.warn("Invalid email or password")
     }
   });
 
