@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import { Button, List } from 'antd';
+import { Button, List, Tabs } from 'antd';
 import axios from 'axios';
 import DateSection from './components/DateSection';
+
+const TabPane = Tabs.TabPane;
 
 const myServicesStub = ['HairDressing', 'NailCare', 'PetTraining']
 const allServicesStub = ['HairDressing', 'OutdoorStroll', 'NailCare', 'PetExercising', 'PetTraining']
@@ -282,20 +284,25 @@ class CareTakerView extends Component {
 
   render() {
     return (
-      <div className="w-100 d-flex">
-        <section className="col-6">
-          <h3>Add your availabilities here</h3>
-          <DateSection changeDate={this.changeDate} title={""} />
-          <Button className="mt-4" onClick={this.setAvailabilityForCareTaker}>Add new Availability</Button>
-        </section>
-        <section className="col-6">
-          <h3>List of availabilities</h3>
-          <List
-            dataSource={this.state.availabilities}
-            renderItem={(item) => (<List.Item>{item}</List.Item>)}
-          />
-        </section>
-      </div>
+      < Tabs type="card">
+        {/* Adding availabilities */}
+        <TabPane tab="Profile" key="1">
+          <div className="w-100 d-flex">
+            <section className="col-6">
+              <h3>Add your availabilities here</h3>
+              <DateSection changeDate={this.changeDate} title={""} />
+              <Button className="mt-4" onClick={this.setAvailabilityForCareTaker}>Add new Availability</Button>
+            </section>
+            <section className="col-6">
+              <h3>List of availabilities</h3>
+              <List
+                dataSource={this.state.availabilities}
+                renderItem={(item) => (<List.Item>{item}</List.Item>)}
+              />
+            </section>
+          </div>
+        </TabPane>
+      </Tabs>
     )
   }
 }
