@@ -25,7 +25,7 @@ class DashboardPage extends Component {
         email: userId,
       });
       if (response.status === 200) {
-        const userName = response.data;
+        const userName = response.data.name;
         this.setState({ userName: userName });
       }
     } catch (err) {
