@@ -7,12 +7,15 @@ const Option = Select.Option;
 const ListItem = List.Item;
 const ListItemMeta = ListItem.Meta;
 
+const petsStub = [{ pid: 1, name: 'Dog1', species: 'Dog', breed: 'Husky', specialNote: 'Likes to poop', diet: 'Vegetarian' },
+                  { pid: 5, name: 'Cat1', species: 'Cat', breed: 'Persian', specialNote: 'Hates Humans', diet: 'None' }];
+
 class PetSection extends Component {
   constructor(props) {
     super(props);
     this.state = {
       userId: this.props.userId,
-      pets: this.props.pets,
+      pets: petsStub,
       pid: '',
       name: '',
       species: '',
@@ -182,7 +185,7 @@ class PetSection extends Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { speciesOpt, breedsOpt, dietsOpt, alert } = this.state;
+    const { speciesOpt, breedsOpt, dietsOpt, alert, pets } = this.state;
     return (
       <div>
         {/* Adding new pets */}
@@ -276,7 +279,7 @@ class PetSection extends Component {
         {/* Display of pets */}
         <List
           itemLayout="horizontal"
-          dataSource={this.state.pets}
+          dataSource={pets}
           renderItem={item => (
             <ListItem>
               <ListItemMeta

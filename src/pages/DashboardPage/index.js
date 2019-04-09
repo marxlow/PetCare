@@ -25,7 +25,7 @@ class DashboardPage extends Component {
   });
 
   render() {
-    const { userId, role, pets } = this.state;
+    const { userId, role } = this.state;
     if ( !localStorage.getItem('role') || role === null ){
       localStorage.clear(); // Remove all key/value pair in localstorage
       this.props.history.push('/login');
