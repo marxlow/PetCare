@@ -82,6 +82,17 @@ class PetSection extends Component {
     } catch (error) {
       message.warn(`Error while fetching diets and species`);
     }
+    try {
+      // Fetch pets for user
+      const petResponse = await axios.post('http://localhost:3030/petsection/', { post: 'getAllDiets' });
+      if (petResponse.status === 200) {
+        const pets = petResponse.data.rows;
+        console.log('> Loaded Pets');
+        this.setState({ pets });
+      }
+    } catch (error) {
+      message.warn(`Error while fetching Pets`);
+    }
   }
 
   // Adding a new pet for a pet owner
@@ -125,6 +136,7 @@ class PetSection extends Component {
     }
   });
 
+  // Delete Pets
   deletePet = (async (pid) => {
     const { userId } = this.state;
   });
@@ -234,46 +246,6 @@ class PetSection extends Component {
 
           <Button className="col-3" type="primary" onClick={this.addToPets}>Add Pet</Button>
         </Form>
-        {() => {switch (alert) {
-            case 'success':
-              return (<Alert
-                message="Successful Update"
-                type="success"
-                showIcon
-                closable
-                afterClose={this.handleAlertClose}
-              />);
-            case 'empty':
-              return (<Alert
-                message="Error"
-                description="There are missing fields. Please input them and submit again."
-                type="error"
-                showIcon
-                closable
-                afterClose={this.handleAlertClose}
-              />);
-            case 'duplicate':
-              return (<Alert
-                message="Error"
-                description="There are duplicate Pets with similar name, species and breed."
-                type="error"
-                showIcon
-                closable
-                afterClose={this.handleAlertClose}
-              />);
-            case 'error':
-              return (<Alert
-                message="Error"
-                description="Error adding pet to database"
-                type="error"
-                showIcon
-                closable
-                afterClose={this.handleAlertClose}
-              />);
-            default:
-              return null;
-          }
-        }}
         <Divider />
 
         {/* Display of pets */}
