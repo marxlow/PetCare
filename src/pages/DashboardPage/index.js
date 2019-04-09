@@ -14,7 +14,8 @@ class DashboardPage extends Component {
     this.state = {
       pets: [],
       userId: localStorage.getItem('userId'), // Read userId from localStorage for making subsequent requests
-      role: localStorage.getItem('role'),
+      // role: localStorage.getItem('role'),
+      role: 'owner', // TODO: Uncomment above when backend is ready.
       userData: {},
     }
   }
@@ -52,7 +53,7 @@ class DashboardPage extends Component {
   });
 
   render() {
-    const { userId, role } = this.state;
+    const { userId, role, pets } = this.state;
     return (
       <div>
         <AppHeader onLogout={this.onLogout} onSearch={this.onSearch} />
@@ -66,7 +67,7 @@ class DashboardPage extends Component {
               </div>
               <div className="d-flex flex-column align-items-center mt-4">
                 <h4>Bob</h4>
-                <h4>{this.state.userId}</h4>
+                <h4>{userId}</h4>
               </div>
             </div>
             <div className="col-8">
@@ -74,7 +75,7 @@ class DashboardPage extends Component {
                 < Tabs type="card">
                   {/* Setting pet information */}
                   <TabPane tab="Profile" key="1">
-                    <PetSection pets={this.state.pets}  userId={this.state.userId} />
+                    <PetSection pets={pets}  userId={userId} />
                   </TabPane>
 
                   {/* Setting dates that each dog wants to be taken care of */}

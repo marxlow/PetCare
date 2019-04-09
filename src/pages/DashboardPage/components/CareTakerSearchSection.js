@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import DateSection from './DateSection';
-import { Slider, Button, List, Card, Divider, InputNumber } from 'antd';
+import { Slider, Button, List, Card, Divider, InputNumber, DatePicker } from 'antd';
 
 const ListItem = List.Item;
 
@@ -11,25 +10,20 @@ class CareTakerSearchSection extends Component {
     this.state = {
       rating: 5,
       experience: 10,
-      startDate: '',
-      endDate: ''
+      date: '',
     }
   }
 
   updateSearchRating = ((value) => {
-    console.log('rating change: '+ value)
     this.setState({ rating: value });
   })
 
   updateSearchExperience = ((value) => {
-    console.log('experience change: '+ value)
     this.setState({ experience: value });
   })
 
-  changeDate = ((startDate, endDate) => {
-    this.setState({ startDate: startDate });
-    this.setState({ endDate: endDate });
-    console.log('State: '+JSON.stringify(this.state))
+  changeDate = ((date) => {
+    this.setState({ date });
   })
 
   render() {
@@ -67,15 +61,16 @@ class CareTakerSearchSection extends Component {
             <Slider defaultValue={experience} max={20} min={0} onChange={this.updateSearchExperience} />
           </div>
           <div>
-            <DateSection changeDate={this.changeDate}/>
+            <DatePicker onChange={this.changeDate} placeHolder="Choose a date" />
           </div>
           <div className="d-flex justify-content-center mt-2">
             <Button className="col-3 mt-2" type="primary" htmlType="submit" onClick>Search</Button>
           </div>
         </section>
         <Divider />
+        
         {/* Results Section */}
-        <section className="mt-4">
+        <section className="d-flex flex-wrap mt-4">
           <List
             grid={{
               gutter: 16, xs: 1, sm: 2, md: 4, lg: 4, xl: 6, xxl: 3,
@@ -87,9 +82,9 @@ class CareTakerSearchSection extends Component {
                   hoverable={true}
                   title={item.name}
                 >
-                  Specialty: {item.specialty}<br/>
-                  Rating: {item.rating}<br/>
-                  Experience: {item.experience}<br/>
+                  Specialty: {item.specialty}<br />
+                  Rating: {item.rating}<br />
+                  Experience: {item.experience}<br />
                 </Card>
                 <InputNumber
                   defaultValue={1000}
@@ -100,7 +95,7 @@ class CareTakerSearchSection extends Component {
                 // onChange={onChange}
                 />
                 <Button className={"w-100"}>Confirm Bid</Button>
-                
+
               </ListItem>
             )}
           />
