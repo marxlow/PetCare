@@ -187,7 +187,7 @@ class RegisterPage extends Component {
                 <label for="inputPhone">Contact Number</label>
                 <input type="text" className="form-control" id="inputEmail" placeholder="Contact Number" onChange={this.updatePhone} />
                 <small id="phoneHelp" className="form-text text-muted">
-                Please Key in only numbers Eg. 12345678. We'll never share your contact number with anyone else.</small>
+                Please Key in only numbers Eg. 92345678. We'll never share your contact number with anyone else.</small>
               </div>
               <div className="form-group">
                 <label for="inputEmail">Email address</label>

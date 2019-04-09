@@ -129,7 +129,8 @@ class CareTakerView extends Component {
     //TODO: @chiasin. Make API call to set avilability.
     // let response = {};
     // try {
-    //   response = await axios.post('http://localhost:3030/', {
+    //   response = await axios.post('http://localhost:3030/caretaker', {
+    //     post: 'addAvailability',  
     //     startDate,
     //     endDate,
     //     minAutoAcceptPrice,

@@ -274,7 +274,7 @@ class PetSection extends Component {
         {/* Display of pets */}
         <List
           itemLayout="horizontal"
-          dataSource={this.state.pets}
+          dataSource={this.state.pets}  
           renderItem={item => (
             <ListItem>
               <ListItemMeta

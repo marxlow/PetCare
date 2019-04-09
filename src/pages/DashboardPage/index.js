@@ -14,16 +14,20 @@ class DashboardPage extends Component {
     this.state = {
       pets: [],
       userId: localStorage.getItem('userId'), // Read userId from localStorage for making subsequent requests
-      // role: localStorage.getItem('role'),
-      role: 'owner', // TODO: Uncomment above when backend is ready.
+      role: localStorage.getItem('role'),
       userData: {},
     }
   }
 
+  // When component firsts load. Fetch that DashBoard supports
+  async componentDidMount() {
+
+  }
+  
   getUserProfile = (async (event) => {
     // TODO: API call to register user
     event.preventDefault();
-    const { userId } = this.state;
+    const { userId, role } = this.state;
     let response = {};
     try{
       response = await axios.post('http://localhost:3030/', {
@@ -54,6 +58,10 @@ class DashboardPage extends Component {
 
   render() {
     const { userId, role, pets } = this.state;
+    if ( !localStorage.getItem('role') || role === null ){
+      localStorage.clear(); // Remove all key/value pair in localstorage
+      this.props.history.push('/login');
+    }
     return (
       <div>
         <AppHeader onLogout={this.onLogout} onSearch={this.onSearch} />
@@ -71,7 +79,7 @@ class DashboardPage extends Component {
               </div>
             </div>
             <div className="col-8">
-              {role === 'owner' ?
+              {role.petowner ?
                 < Tabs type="card">
                   {/* Setting pet information */}
                   <TabPane tab="Profile" key="1">
