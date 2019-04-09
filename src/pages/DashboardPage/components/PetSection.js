@@ -33,6 +33,7 @@ class PetSection extends Component {
     this.state = {
       userId: this.userId,
       pets: this.pets,
+      pid: '',
       name: '',
       species: '',
       breed: '',
@@ -170,13 +171,6 @@ class PetSection extends Component {
       console.log('Empty fields: Will not update pets');
       return
     }
-    var newPet = {
-      name: this.state.name,
-      species: this.state.species,
-      breed: this.state.breed,
-      specialNote: this.state.specialNote,
-      diet: this.state.diet
-    };
     const nextPets = Object.assign([], this.state.pets);
     // Check if there are duplicate (name, breed)
     for (var i=0; i<nextPets.length; i++){
@@ -192,7 +186,7 @@ class PetSection extends Component {
     // Database
     event.preventDefault();
     const { userId } = this.state;
-    const { name, species, breed, specialNote, diet } = newPet
+    const { name, species, breed, specialNote, diet } = this.state;
     let response = {};
     const data = {
       post: 'addPets',
@@ -212,13 +206,68 @@ class PetSection extends Component {
       return
     }
     if (response.status === 200) {
-      console.log("Added pet to Database for " + this.state.userId)
+      let newPet = {
+        pid: response.data, //receive pid from backend
+        name: name,
+        species: species,
+        breed: breed,
+        specialNote: specialNote,
+        diet: diet
+      };
+      console.log("Added pet to Database for " + userId)
       console.log('onClick Event addToPets: Adding '+ JSON.stringify(newPet));
       nextPets.push(newPet);
       this.setState({ 
         pets: nextPets,
         alert: 'success'
       });
+    } else {
+      // TODO: Show error
+      console.error("Unable to add pet to Database for user. Status: " + response.status )
+      this.setState({ alert: 'error' })
+    }
+  });
+
+  deletePet = (async (event) => {
+    console.log('Deleting Pets ' + JSON.stringify(this.state.pets));
+    // Database
+    event.preventDefault();
+    const nextPets = Object.assign([], this.state.pets);
+    const { userId } = this.state;
+    const { pid } = this.state;
+    let response = {};
+    try {
+      response = await axios.post('http://localhost:3030/petsection/', {
+        pid
+      });
+    } catch (err) {
+      console.error("Unable to delete pet to Database for user. Error: " + err.response.data)
+      this.setState({ alert: 'error' })
+      return
+    }
+    if (response.status === 200) {
+      let oldPet = {};
+      let delIdx = -1;
+      for (var i=0; i<nextPets.length; i++){
+        if(nextPets[i].pid === pid){
+          oldPet = nextPets[i];
+          delIdx = i;
+          break;
+        } 
+      }
+      console.log("Deleting pet from Database for " + userId)
+      //Pet with pid not found
+      if (delIdx === -1 || oldPet === {}) {
+        console.log("Unable to delete pet from state")
+      } else {
+        console.log('onClick Event deletePet: Deleting '+ JSON.stringify(oldPet));
+        nextPets.splice(delIdx, 1);
+        this.setState({ 
+          pets: nextPets,
+          alert: 'success'
+        });
+      }
+      this.setState({ alert: 'success' });
     } else {
       // TODO: Show error
       console.error("Unable to add pet to Database for user. Status: " + response.status )
@@ -325,7 +374,7 @@ class PetSection extends Component {
               {getFieldDecorator('dietSelect', {
                 rules: [{ required: true, message: 'Please select a diet' }],
               })(
-                <Select placeholder="Please select a diet" onSelect={this.handleDietChange}>
+                <Select placeholder="Please select a diet" onSelect={this.handleDietChange.bind(this)}>
                   {/* <Option value="Vegetarian">Vegetarian</Option>
                   <Option value="Carnivore">Carnivore</Option>
                   <Option value="Gluten-free">Gluten-free</Option> */}
