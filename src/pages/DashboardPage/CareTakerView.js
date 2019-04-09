@@ -12,7 +12,7 @@ class CareTakerView extends Component {
       availabilities: [],
       startDate: '',
       endDate: '',
-      minAutoAcceptPrice: -1,
+      minAutoAcceptPrice: 99999999,
     }
   }
 
@@ -23,7 +23,7 @@ class CareTakerView extends Component {
 
 // //caretaker route request types: 
 // getAvailability:previously added availabilities
-// ( input: email output: startdate, enddate, price) , 
+// ( input: email output: [{startdate, enddate, price}]) , 
 // getWorkDates: get all confirmed bids 
 // ( input: email output: DateOfService, petownerEmail, price), 
 // addAvailability: add avail
@@ -64,7 +64,7 @@ class CareTakerView extends Component {
     ]
 
     // Transform start and end dates to be day by day
-    const avilabilitiesStub = [];
+    const availabilitiesStub = [];
 
     // TODO: Assumes all availbility range are in the same month
     for (let i = 0; i < availabilityRangeStub.length; i++) {
@@ -75,21 +75,57 @@ class CareTakerView extends Component {
 
       for (let j = startDay; j <= endDay; j++) {
         if (j < 10) {
-          avilabilitiesStub.push(`${yyyymm}0${j}`);
+          availabilitiesStub.push(`${yyyymm}0${j}`);
         } else {
-          avilabilitiesStub.push(`${yyyymm}${j}`);
+          availabilitiesStub.push(`${yyyymm}${j}`);
         }
       }
     }
 
     this.setState({
-      availabilities: avilabilitiesStub,
+      availabilities: availabilitiesStub,
     })
   });
 
-  setAvailbilityForCareTaker = (async () => {
-    const { startDate, endDate, minAutoAcceptPrice } = this.state;
+  setAvailabilityForCareTaker = (async () => {
+    const { startDate, endDate, minAutoAcceptPrice, availabilities } = this.state;
     console.log(startDate, endDate);
+
+    // Transform start and end dates to be day by day
+    let newAvailabilities = Object.assign([], availabilities);
+    
+    // TODO: Assumes all availability range are in the same month
+    const yyyymm = startDate.slice(0, 8);
+    const startDay = parseInt(startDate.split('-')[2]);
+    const endDay = parseInt(endDate.split('-')[2]);
+    
+    for (let j = startDay; j <= endDay; j++) {
+      if (j < 10) {
+        newAvailabilities.push(`${yyyymm}0${j}`);
+      } else {
+        newAvailabilities.push(`${yyyymm}${j}`);
+      }
+    }
+    // Remove Duplicates
+    newAvailabilities = newAvailabilities.filter((value, index, self) => {
+      return self.indexOf(value) === index;
+    });
+
+    console.log("Unsorted:", newAvailabilities)
+
+    // Sort in order of Dates
+    newAvailabilities.sort((a,b) => {
+      if (!a || !b) { return; }
+      // Turn your strings into dates, and then s ubtract them
+      // to get a value that is either negative, positive, or zero.
+      return new Date(a) - new Date(b);
+    });
+    this.setState({
+      availabilities: newAvailabilities,
+    })
+
+    console.log("Sorted:", this.state.availabilities)
+
     //TODO: @chiasin. Make API call to set avilability.
     // let response = {};
     // try {
@@ -124,12 +160,12 @@ class CareTakerView extends Component {
     return (
       <div className="w-100 d-flex">
         <section className="col-6">
-          <h3>Add your availbilities here</h3>
+          <h3>Add your availabilities here</h3>
           <DateSection changeDate={this.changeDate} title={""} />
-          <Button className="mt-4" onClick={this.setAvailbilityForCareTaker}>Add new Availbility</Button>
+          <Button className="mt-4" onClick={this.setAvailabilityForCareTaker}>Add new Availability</Button>
         </section>
         <section className="col-6">
-          <h3>List of availbilities</h3>
+          <h3>List of availabilities</h3>
           <List
             dataSource={this.state.availabilities}
             renderItem={(item) => (<List.Item>{item}</List.Item>)}
