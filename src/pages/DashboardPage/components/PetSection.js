@@ -221,6 +221,7 @@ class PetSection extends Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
+    const { speciesOpt, breedsOpt, dietsOpt, alert } = this.state;
     return (
       <div>
         {/* Adding new pets */}
@@ -237,7 +238,7 @@ class PetSection extends Component {
           <FormItem className="col-3 mx-2" label="Species">
             {getFieldDecorator('speciesSelect', { rules: [{ required: true, message: 'Please select a species' }] })(
               <Select placeholder="Please select a species" onSelect={this.handleSpeciesChange}>
-                {this.state.speciesOpt.map((item) => <Option value={item.speciesname}>{item.speciesname}</Option>)}
+                {speciesOpt.map((item) => <Option value={item.speciesname}>{item.speciesname}</Option>)}
               </Select>
             )}
           </FormItem>
@@ -246,7 +247,7 @@ class PetSection extends Component {
           <FormItem className="col-3 mx-2" label="Breed">
             {getFieldDecorator('breedSelect', { rules: [{ required: true, message: 'Please select a breed' }] })(
               <Select placeholder="Please select a breed" onSelect={this.handleBreedChange}>
-                {this.state.breedsOpt.map((item) => <Option value={item.breedname}>{item.breedname}</Option>)}
+                {breedsOpt.map((item) => <Option value={item.breedname}>{item.breedname}</Option>)}
               </Select>
             )}
           </FormItem>
@@ -255,7 +256,7 @@ class PetSection extends Component {
           <FormItem className="col-5 mx-2" label="Diet">
             {getFieldDecorator('dietSelect', { rules: [{ required: true, message: 'Please select a diet' }] })(
               <Select placeholder="Please select a diet" onSelect={this.handleDietChange}>
-                {this.state.dietsOpt.map((item) => <Option value={item.diet}>{item.diet}</Option>)}
+                {dietsOpt.map((item) => <Option value={item.diet}>{item.diet}</Option>)}
               </Select>
             )}
           </FormItem>
@@ -269,6 +270,46 @@ class PetSection extends Component {
 
           <Button className="col-3" type="primary" onClick={this.addToPets}>Add Pet</Button>
         </Form>
+        {() => {switch (alert) {
+            case 'success':
+              return (<Alert
+                message="Successful Update"
+                type="success"
+                showIcon
+                closable
+                afterClose={this.handleAlertClose}
+              />);
+            case 'empty':
+              return (<Alert
+                message="Error"
+                description="There are missing fields. Please input them and submit again."
+                type="error"
+                showIcon
+                closable
+                afterClose={this.handleAlertClose}
+              />);
+            case 'duplicate':
+              return (<Alert
+                message="Error"
+                description="There are duplicate Pets with similar name, species and breed."
+                type="error"
+                showIcon
+                closable
+                afterClose={this.handleAlertClose}
+              />);
+            case 'error':
+              return (<Alert
+                message="Error"
+                description="Error adding pet to database"
+                type="error"
+                showIcon
+                closable
+                afterClose={this.handleAlertClose}
+              />);
+            default:
+              return null;
+          }
+        }}
         <Divider />
 
         {/* Display of pets */}

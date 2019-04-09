@@ -58,6 +58,7 @@ class DashboardPage extends Component {
 
   render() {
     const { userId, role, pets } = this.state;
+    console.log("Role:", JSON.stringify(role), JSON.stringify(localStorage.getItem('role')));
     if ( !localStorage.getItem('role') || role === null ){
       localStorage.clear(); // Remove all key/value pair in localstorage
       this.props.history.push('/login');
@@ -75,11 +76,12 @@ class DashboardPage extends Component {
               </div>
               <div className="d-flex flex-column align-items-center mt-4">
                 <h4>Bob</h4>
+                <h4>{role}</h4>
                 <h4>{userId}</h4>
               </div>
             </div>
             <div className="col-8">
-              {role.petowner ?
+              {role.petowner === true ?
                 < Tabs type="card">
                   {/* Setting pet information */}
                   <TabPane tab="Profile" key="1">
@@ -97,7 +99,13 @@ class DashboardPage extends Component {
                   </TabPane>
                 </Tabs>
                 :
-                <CareTakerView />
+                < Tabs type="card">
+                  {/* Setting pet information */}
+                  <TabPane tab="Profile" key="1">
+                    <CareTakerView />
+                  </TabPane>
+                  {/* Searching & Bidding for care takers */}
+                </Tabs>
               }
             </div>
           </div>
