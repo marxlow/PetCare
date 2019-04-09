@@ -1,38 +1,18 @@
 import React, { Component } from 'react';
-import { Form, Input, Select, Button, Divider, List, Avatar, Alert } from 'antd';
+import { Form, Input, Select, Button, Divider, List, Avatar, Alert, message } from 'antd';
 import axios from 'axios';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
 const ListItem = List.Item;
 const ListItemMeta = ListItem.Meta;
-const petStubs = [
-  {
-    name: 'John',
-    species: 'Dog',
-    breed: 'Corgi',
-    diet: 'None',
-    specialNote: 'Likes to poop',
-  },
-  {
-    name: 'Doe',
-    species: 'Dog',
-    breed: 'Golden Retriever',
-    diet: 'Vegetarian',
-    specialNote: 'Likes to poop',
-  }
-]; // + this.props.pets
-
-let breedsOpt = [{ breedname: 'No Species Specified' }]
 
 class PetSection extends Component {
   constructor(props) {
     super(props);
-    this.pets = this.props.pets
-    this.userId = this.props.userId
     this.state = {
-      userId: this.userId,
-      pets: this.pets,
+      userId: this.props.userId,
+      pets: this.props.pets,
       pid: '',
       name: '',
       species: '',
@@ -40,198 +20,108 @@ class PetSection extends Component {
       specialNote: '',
       diet: '',
       alert: 'invisible',
-      submitted: true,
-      breedsOpt: breedsOpt,
+      breedsOpt: [{ breedname: 'No Species Specified' }],
       speciesOpt: [],
       dietsOpt: [],
     };
-    // Changed to true when Add pet button is clicked
-    this.submitted = false
-    this.handleNameChange = (e) => {
-      console.log('handleNameChange: ' + e.target.value);
-      this.setState({ name: e.target.value })
-    };
-    this.handleSpeciesChange = (value, e) => {
-      this.setState({ species: value })
-      console.log('handleSpeciesChange: ' + value + ":" + this.state.species);
-    };
-    this.handleBreedChange = (value, e) => {
-      this.setState({ breed: value })
-      console.log('handleBreedChange: ' + value + ":" + this.state.breed);
-    };
-    this.handleDietChange = (value, e) => {
-      this.setState({ diet: value })
-      console.log('handleDietChange: ' + value + ":" + this.state.diet);
-    };
-    this.handleSpecialNoteChange = (e) => {
-      console.log('handleSpecialNoteChange: ' + e.target.value);
-      this.setState({ specialNote: e.target.value })
-    };
-    this.handleBreedsListChange = (value, e) => {
-      this.setState({ breedsOpt: value })
-      console.log('handleBreedsListChange: ' + value + ":" + this.state.breedsOpt);
-    };
   }
 
-  getDietsOpt = (async (event) => {
-    // TODO: API call to register user
-    // event.preventDefault();
-    let response = {};
-    try{
-      response = await axios.post('http://localhost:3030/petsection/', {
-        post: 'getAllDiets'
-      });
-    } catch (err) {
-      console.error("Unable to retrieve diets from Database. Error: " + err.response.data)
-    }
-    if (response.status === 200) {
-      let dietsOpt = response.data.rows    
-      console.log("GET Diets: " + dietsOpt)
-      this.setState({ dietsOpt: dietsOpt })
-      console.log("GET Diets: " + dietsOpt[0].diet)
-    } else {
-      // TODO: Show error
-      console.error("Unable to retrieve diets from Database")
-    }
+  // Update name of pet
+  handleNameChange = ((e) => {
+    this.setState({ name: e.target.value })
   });
 
-  getSpeciesOpt = (async (event) => {
-    // TODO: API call to register user
-    // event.preventDefault();
-    let response = {};
-    try{
-      response = await axios.post('http://localhost:3030/petsection/', {
-        post: 'getAllSpecies'
-      });
-    } catch (err) {
-      console.error("Unable to retrieve species from Database. Error: " + err.response.data)
-    }
-    if (response.status === 200) {
-      let speciesOpt = response.data.rows
-      console.log("GET Species: " + speciesOpt)
-      this.setState({ speciesOpt: speciesOpt })
-      console.log("GET Species: " + speciesOpt[0].speciesname)
-    } else {
-      // TODO: Show error
-      console.error("Unable to retrieve species from Database")
-    }
+  // Update breed of pet, e.g Golden Retriever
+  handleBreedChange = ((value) => {
+    this.setState({ breed: value });
   });
 
-  getBreedsOpt = (async (event) => {
-    // TODO: API call to register user
-    // event.preventDefault(); 
-    const { species } = this.state;
-    console.log("POST Breeds: " + species)
-    let response = {};
+  // Changing of diet
+  handleDietChange = ((value) => {
+    this.setState({ diet: value });
+  });
+
+  // Changing of any notes of pet
+  handleSpecialNoteChange = ((e) => {
+    this.setState({ specialNote: e.target.value })
+  });
+
+  // When species change, e.g to "dog". We have to fetch the breeds allowed for the species.
+  handleSpeciesChange = (async (value) => {
     try {
-      response = await axios.post('http://localhost:3030/petsection/', {
-        post: 'getAllBreeds', 
-        speciesName: species
+      const response = await axios.post('http://localhost:3030/petsection/', {
+        post: 'getAllBreeds',
+        speciesName: value
       });
+      if (response.status === 200) {
+        let breedsOpt = response.data.rows
+        console.log(`> Loaded breeds for species: ${value}`);
+        this.setState({ breedsOpt: breedsOpt, species: value });
+      }
     } catch (err) {
-      console.error("Unable to retrieve breeds from Database for chosen species. Error: " + err.response.data)
+      message.warn(`Unable to retrieve breeds from DB for chosen species: ${value} Error: ${err.response.data}`);
     }
-    if (response.status === 200) {
-      let breedsOpt = response.data.rows
-      this.setState({ breedsOpt: breedsOpt })
-      console.log("GET Breeds: " + breedsOpt)
-      console.log("GET Breeds: " + breedsOpt[0].breedname)
-    } else {
-      // TODO: Show error
-      console.error("Unable to retrieve breeds from Database for chosen species")
-    }
-  });
-
-  onChangeSpecies = ((value, event) => {
-    this.handleSpeciesChange(value, event);
-    const { species } = this.state;
-    console.log("POST Breeds: " + species)
-    this.getBreedsOpt(event);
   })
 
-  loadSpeciesDiet = ((event) => {
-    console.log("On Load PetSection")
-    this.getDietsOpt(event);
-    this.getSpeciesOpt(event);
-  });
+  // When component firsts load. Fetch species & diets that PetCare supports
+  async componentDidMount() {
+    try {
+      // Fetch diets & species
+      const dietResponse = await axios.post('http://localhost:3030/petsection/', { post: 'getAllDiets' });
+      const speciesResponse = await axios.post('http://localhost:3030/petsection/', { post: 'getAllSpecies' });
+      if (dietResponse.status === 200 && speciesResponse.status === 200) {
+        const dietsOpt = dietResponse.data.rows;
+        const speciesOpt = speciesResponse.data.rows;
+        console.log('> Loaded Diets & Species');
+        this.setState({ dietsOpt, speciesOpt });
+      }
+    } catch (error) {
+      message.warn(`Error while fetching diets and species`);
+    }
+  }
 
-  toggleSubmitted = (() => {
-    this.setState({ submitted: !this.state.submitted })
-      console.log('toggled submitted: '+ this.submitted)
-  })
-
+  // Adding a new pet for a pet owner
   addToPets = (async (event) => {
-    this.submitted = true
-    this.toggleSubmitted()
-    if (this.state.name === '' ||
-      this.state.species === '' ||
-      // this.state.breed === '' ||
-      this.state.diet === ''){
-      this.setState({ alert: 'empty' })
-      console.log('Empty fields: Will not update pets');
-      return
+    // Guard against missing fields.
+    const { userId, name, species, breed, diet, specialNote, pets } = this.state;
+    if (name === '' || species === '' || breed === '' || diet === '') {
+      this.setState({ alert: 'empty' });
+      return;
     }
-    const nextPets = Object.assign([], this.state.pets);
-    // Check if there are duplicate (name, breed)
-    for (var i=0; i<nextPets.length; i++){
-      if (nextPets[i].name === this.state.name && 
-          nextPets[i].species === this.state.species && 
-          nextPets[i].breed === this.state.breed ){
-        this.setState({ alert: 'duplicate' })
-        console.log('Duplicated Name, Species and Breed: ('+this.state.name+', '+this.state.breed+') Will not update pets');
-        return
+    // Guard against duplicate pets. When name, species & breed already exists.
+    if (pets.length > 0) {
+      for (let i = 0; i < pets.length; i++) {
+        if (pets[i].name === name && pets[i].species === species && pets[i].breed === breed) {
+          this.setState({ alert: 'duplicate' });
+          return;
+        }
       }
     }
-    console.log('Updating Pets ' + JSON.stringify(this.state.pets));
-    // Database
-    event.preventDefault();
-    const { userId } = this.state;
-    const { name, species, breed, specialNote, diet } = this.state;
-    let response = {};
+    // All guards pass, proceed to add pet to DB
     const data = {
+      name,
+      diet,
+      specialNote,
       post: 'addPets',
       email: userId,
-      name: name,
       speciesName: species,
-      breedName: breed,
-      diet: diet,
-      specialNote: specialNote,
-    }
-    console.log("Posting data: " + JSON.stringify(data))
+      breedName: breed
+    };
     try {
-      response = await axios.post('http://localhost:3030/petsection/', data);
+      const response = await axios.post('http://localhost:3030/petsection/', data);
+      if (response.status === 200) {
+        const newPet = { pid: response.data, name, species, breed, specialNote, diet };
+        const nextPets = Object.assign([], pets);
+        nextPets.push(newPet);
+        this.setState({ pets: nextPets, alert: `Success! Added ${name} as your pet` });
+      }
     } catch (err) {
-      console.error("Unable to add pet to Database for user. Error: " + err.response.data)
-      this.setState({ alert: 'error' })
-      return
-    }
-    if (response.status === 200) {
-      let newPet = {
-        pid: response.data, //receive pid from backend
-        name: name,
-        species: species,
-        breed: breed,
-        specialNote: specialNote,
-        diet: diet
-      };
-      console.log("Added pet to Database for " + userId)
-      console.log('onClick Event addToPets: Adding '+ JSON.stringify(newPet));
-      nextPets.push(newPet);
-      this.setState({ 
-        pets: nextPets,
-        alert: 'success'
-      });
-    } else {
-      // TODO: Show error
-      console.error("Unable to add pet to Database for user. Status: " + response.status )
-      this.setState({ alert: 'error' })
+      console.error("Unable to add pet to Database for user. Error: " + err.response.data);
+      this.setState({ alert: 'error' });
     }
   });
 
   deletePet = (async (event) => {
-    console.log('Deleting Pets ' + JSON.stringify(this.state.pets));
-    // Database
-    event.preventDefault();
     const nextPets = Object.assign([], this.state.pets);
     const { userId } = this.state;
     const { pid } = this.state;
@@ -248,21 +138,21 @@ class PetSection extends Component {
     if (response.status === 200) {
       let oldPet = {};
       let delIdx = -1;
-      for (var i=0; i<nextPets.length; i++){
-        if(nextPets[i].pid === pid){
+      for (var i = 0; i < nextPets.length; i++) {
+        if (nextPets[i].pid === pid) {
           oldPet = nextPets[i];
           delIdx = i;
           break;
-        } 
+        }
       }
       console.log("Deleting pet from Database for " + userId)
       //Pet with pid not found
       if (delIdx === -1 || oldPet === {}) {
         console.log("Unable to delete pet from state")
       } else {
-        console.log('onClick Event deletePet: Deleting '+ JSON.stringify(oldPet));
+        console.log('onClick Event deletePet: Deleting ' + JSON.stringify(oldPet));
         nextPets.splice(delIdx, 1);
-        this.setState({ 
+        this.setState({
           pets: nextPets,
           alert: 'success'
         });
@@ -270,132 +160,118 @@ class PetSection extends Component {
       this.setState({ alert: 'success' });
     } else {
       // TODO: Show error
-      console.error("Unable to add pet to Database for user. Status: " + response.status )
+      console.error("Unable to add pet to Database for user. Status: " + response.status)
       this.setState({ alert: 'error' })
     }
   });
 
-  handleClose = (() => {
-    this.setState({ alert: 'invisible' });
-  });
+  // Closing of Alert
+  handleAlertClose = (() => { this.setState({ alert: 'invisible' }); });
 
   SubmitResponse = (e) => {
-    if (this.submitted === true) {
-      this.submitted = false
-      switch(this.state.alert) {
-        case 'success':
+    switch (this.state.alert) {
+      case 'success':
         return (<Alert
-            message="Successful Update"
-            type="success"
-            showIcon
-            closable
-            afterClose={this.handleClose}
-          />);
-        case 'empty':  
-          return (<Alert
-              message="Error"
-              description="There are missing fields. Please input them and submit again."
-              type="error"
-              showIcon
-              closable
-              afterClose={this.handleClose}
-            />);
-        // case 'duplicateName':
-        //   return <Alert
-        //       message="Warning"
-        //       description="There are duplicate Pets with similar name."
-        //       type="warning"
-        //       showIcon
-        //       closable
-        //       afterClose={this.handleClose}
-        //     />;
-        case 'duplicate':  
-          return (<Alert
-              message="Error"
-              description="There are duplicate Pets with similar name, species and breed."
-              type="error"
-              showIcon
-              closable
-              afterClose={this.handleClose}
-            />);
-        case 'error':  
-          return (<Alert
-              message="Error"
-              description="Error adding pet to database"
-              type="error"
-              showIcon
-              closable
-              afterClose={this.handleClose}
-            />);
-        default:
-          return null; 
-      }
+          message="Successful Update"
+          type="success"
+          showIcon
+          closable
+          afterClose={this.handleAlertClose}
+        />);
+      case 'empty':
+        return (<Alert
+          message="Error"
+          description="There are missing fields. Please input them and submit again."
+          type="error"
+          showIcon
+          closable
+          afterClose={this.handleAlertClose}
+        />);
+      // case 'duplicateName':
+      //   return <Alert
+      //       message="Warning"
+      //       description="There are duplicate Pets with similar name."
+      //       type="warning"
+      //       showIcon
+      //       closable
+      //       afterClose={this.handleAlertClose}
+      //     />;
+      case 'duplicate':
+        return (<Alert
+          message="Error"
+          description="There are duplicate Pets with similar name, species and breed."
+          type="error"
+          showIcon
+          closable
+          afterClose={this.handleAlertClose}
+        />);
+      case 'error':
+        return (<Alert
+          message="Error"
+          description="Error adding pet to database"
+          type="error"
+          showIcon
+          closable
+          afterClose={this.handleAlertClose}
+        />);
+      default:
+        return null;
     }
   };
 
   render() {
     const { getFieldDecorator } = this.props.form;
-
     return (
-      <div onLoad={this.loadSpeciesDiet}>
+      <div>
         {/* Adding new pets */}
-        <Form className="d-flex flex-column" onAbort={this.handleClose}>
-          <div className="d-flex w-100">
-            <FormItem className="col-5 mx-2" label="Name">
-              {getFieldDecorator('petName', {
-                rules: [{ required: true, message: 'Please input your Pet name!' }],
-              })(
-                <Input onChange={this.handleNameChange}/>
-              )}
-            </FormItem>
-            <FormItem className="col-3 mx-2" label="Species">
-              {getFieldDecorator('speciesSelect', {
-                rules: [{ required: true, message: 'Please select a species' }],
-              })(
-                <Select placeholder="Please select a species" onSelect={this.onChangeSpecies}>
-                  {this.state.speciesOpt.map((item) => <Option value={item.speciesname}>{item.speciesname}</Option>)}
-                </Select>
-              )}
-            </FormItem>
-            <FormItem className="col-3 mx-2" label="Breed">
-              {getFieldDecorator('breedSelect', {
-                rules: [{ required: true, message: 'Please select a breed' }],
-              })(
-                <Select placeholder="Please select a breed" onSelect={this.handleBreedChange}>
-                  {/* <Option value="Golden Retriever">Golden Retriever</Option>
-                  <Option value="Corgi">Corgi</Option> */}
-                  {this.state.breedsOpt.map((item) => <Option value={item.breedname}>{item.breedname}</Option>)}
-                </Select>
-              )}
-            </FormItem>
-          </div>
-          <div className="d-flex w-100">
-            <FormItem className="col-5 mx-2" label="Diet">
-              {getFieldDecorator('dietSelect', {
-                rules: [{ required: true, message: 'Please select a diet' }],
-              })(
-                <Select placeholder="Please select a diet" onSelect={this.handleDietChange.bind(this)}>
-                  {/* <Option value="Vegetarian">Vegetarian</Option>
-                  <Option value="Carnivore">Carnivore</Option>
-                  <Option value="Gluten-free">Gluten-free</Option> */}
-                  {this.state.dietsOpt.map((item) => <Option value={item.diet}>{item.diet}</Option>)}
-                </Select>
-              )}
-            </FormItem>
-            <FormItem className="col-5 mx-2" label="Special Notes">
-              {getFieldDecorator('specialNote', {
-                rules: [{ required: false, message: 'Any other concerns?' }],
-              })(
-                <Input onChange={this.handleSpecialNoteChange}/>
-              )}
-            </FormItem>
-          </div>
-          <Button className="col-3" type="primary" htmlType="submit"
-             onClick={this.addToPets}>Add Pet</Button>
-          {/* Submission response alerts when there is error */}
-          {this.SubmitResponse()}
+        <Form className="d-flex flex-wrap" onAbort={this.handleClose}>
+
+          {/* Pet Name */}
+          <FormItem className="col-5 mx-2" label="Name">
+            {getFieldDecorator('petName', { rules: [{ required: true, message: 'Please input your Pet name!' }] })(
+              <Input onChange={this.handleNameChange} />
+            )}
+          </FormItem>
+
+          {/* Species of Pet, e.g Dog or Cat */}
+          <FormItem className="col-3 mx-2" label="Species">
+            {getFieldDecorator('speciesSelect', { rules: [{ required: true, message: 'Please select a species' }] })(
+              <Select placeholder="Please select a species" onSelect={this.handleSpeciesChange}>
+                {this.state.speciesOpt.map((item) => <Option value={item.speciesname}>{item.speciesname}</Option>)}
+              </Select>
+            )}
+          </FormItem>
+
+          {/* Breed of species e.g Golden Retriever */}
+          <FormItem className="col-3 mx-2" label="Breed">
+            {getFieldDecorator('breedSelect', { rules: [{ required: true, message: 'Please select a breed' }] })(
+              <Select placeholder="Please select a breed" onSelect={this.handleBreedChange}>
+                {this.state.breedsOpt.map((item) => <Option value={item.breedname}>{item.breedname}</Option>)}
+              </Select>
+            )}
+          </FormItem>
+
+          {/* Diet of Pet */}
+          <FormItem className="col-5 mx-2" label="Diet">
+            {getFieldDecorator('dietSelect', { rules: [{ required: true, message: 'Please select a diet' }] })(
+              <Select placeholder="Please select a diet" onSelect={this.handleDietChange}>
+                {this.state.dietsOpt.map((item) => <Option value={item.diet}>{item.diet}</Option>)}
+              </Select>
+            )}
+          </FormItem>
+
+          {/* Other notes we need to know */}
+          <FormItem className="col-5 mx-2" label="Special Notes">
+            {getFieldDecorator('specialNote', { rules: [{ required: false, message: 'Any other concerns?' }] })(
+              <Input onChange={this.handleSpecialNoteChange} />
+            )}
+          </FormItem>
+
+          <Button className="col-3" type="primary" onClick={this.addToPets}>Add Pet</Button>
         </Form>
         <Divider />
+
+        {/* Display of pets */}
         <List
           itemLayout="horizontal"
           dataSource={this.state.pets}
@@ -413,5 +289,5 @@ class PetSection extends Component {
     )
   }
 }
-    
-export default Form.create({name: "pet" })(PetSection);
+
+export default Form.create({ name: "pet" })(PetSection);
