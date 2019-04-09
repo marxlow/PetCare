@@ -69,6 +69,7 @@ class PetSection extends Component {
   // When component firsts load. 
   // Fetch species & diets that PetCare supports.
   async componentDidMount() {
+    const { userId } = this.state;
     try {
       // Fetch diets & species
       const dietResponse = await axios.post('http://localhost:3030/petsection/', { post: 'getAllDiets' });
@@ -84,10 +85,13 @@ class PetSection extends Component {
     }
     try {
       // Fetch pets for user
-      const petResponse = await axios.post('http://localhost:3030/petsection/', { post: 'getAllDiets' });
+      const petResponse = await axios.post('http://localhost:3030/petsection/', { 
+        post: 'getAllPets',
+        email: userId,
+      });
       if (petResponse.status === 200) {
         const pets = petResponse.data.rows;
-        console.log('> Loaded Pets');
+        console.log('> Loaded Pets', pets);
         this.setState({ pets });
       }
     } catch (error) {
