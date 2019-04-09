@@ -34,13 +34,16 @@ class LoginPage extends Component {
       console.error("Unable to login. Invalid email or password. Error: " + err.response.data)
     }
     if (response.status === 200) {
+      console.log("Login as " + JSON.stringify(response.data))
       const userId = response.data.email;
+      // const role = response.data.role;
       // Write userId to localStorage. Think of local storage as a global class that all components have access to.
       localStorage.setItem('userId', userId);
 
       // TODO: Depends on role from backend. To see owner view. Comment the code below and uncomment the next.
-      // localStorage.setItem('role', 'caretaker'); 
-      localStorage.setItem('role', 'owner'); 
+      localStorage.setItem('role', 'caretaker'); 
+      // localStorage.setItem('role', 'owner');
+      // localStorage.setItem('role', role); 
 
       this.props.history.push({
         pathname: '/',  

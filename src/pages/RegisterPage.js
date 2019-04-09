@@ -101,8 +101,8 @@ class RegisterPage extends Component {
       // this.setState({ alert: 'success' });
     } else {
       // TODO: Show error
-      // console.error("Error creating profile. Status: " + response.status)
-      // this.setState({ alert: 'error' });
+      console.error("Error creating profile. Status: " + response.status)
+      this.setState({ alert: 'error' });
     }
   });
 

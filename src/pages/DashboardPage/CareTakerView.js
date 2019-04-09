@@ -12,6 +12,7 @@ class CareTakerView extends Component {
       availabilities: [],
       startDate: '',
       endDate: '',
+      minAutoAcceptPrice: -1,
     }
   }
 
@@ -20,17 +21,43 @@ class CareTakerView extends Component {
     await this.getDatesForCareTaker();
   }
 
+// //caretaker route request types: 
+// getAvailability:previously added availabilities
+// ( input: email output: startdate, enddate, price) , 
+// getWorkDates: get all confirmed bids 
+// ( input: email output: DateOfService, petownerEmail, price), 
+// addAvailability: add avail
+// ( input: startdate, enddate, minAutoAcceptPrice, email output: startdate, enddate(?))
+// getAllService: get all available types service
+// ( input: nothing(?) output: all services)
+// getMyService: get my provided service
+// ( input: email output: all provided service(?)
+// addService: add service
+// ( input: array of services(?) output: all provided service(?), 
+// removeService: remove service 
+// ( input: array of services(?) output: all provided service(?)), 
+// getBids: get all available bid dates and current highest bid
+// ( input: email output: dates, current highest bid), 
+// acceptBid: accept current highest bid of a specific day
+// ( input: caretakerEmail, dateOfService output: petownerEmail, dateOfService, Price?)
+
   // Make API call to fetch dates
   getDatesForCareTaker = (async () => {
     // TODO: @chiasin. Make API call for all availabilities
     // let response = {}
     // try {
     //   response = await axios.get('http://localhost:3030/', {
-    //   userId: this.state.userId,
+    //     email: this.state.userId,
     //   });
     // } catch (err) {
-
+    //   console.error("Unable to get Availabilities. Error: " + err.response.data)
     // }
+    // if (response.status === 200) {
+    //   const { startdate, enddate, price } = response.data;
+    // } else {
+    //   console.error("Unable to get Availabilities. Status: " + response.status)
+    // }
+
     const availabilityRangeStub = [
       { startDate: '2019-04-01', endDate: '2019-04-02' },
       { startDate: '2019-04-05', endDate: '2019-04-10' },
@@ -61,7 +88,7 @@ class CareTakerView extends Component {
   });
 
   setAvailbilityForCareTaker = (async () => {
-    const { startDate, endDate } = this.state;
+    const { startDate, endDate, minAutoAcceptPrice } = this.state;
     console.log(startDate, endDate);
     //TODO: @chiasin. Make API call to set avilability.
     // let response = {};
@@ -69,10 +96,16 @@ class CareTakerView extends Component {
     //   response = await axios.post('http://localhost:3030/', {
     //     startDate,
     //     endDate,
-    //     userId: this.state.userId
+    //     minAutoAcceptPrice,
+    //     email: this.state.userId
     //   });
     // } catch (err) {
-    //   console.log("STUB")
+    //   console.error("Unable to set Availabilities. Error: " + err.response.data)
+    // }
+    // if (response.status === 200) {
+    //   const { startdate, enddate } = response.data;
+    // } else {
+    //   console.error("Unable to set Availabilities. Status: " + response.status)
     // }
     
     // TODO: @chiasin. Refresh availbilities.
