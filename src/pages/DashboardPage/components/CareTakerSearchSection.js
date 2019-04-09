@@ -99,6 +99,8 @@ class CareTakerSearchSection extends Component {
               </ListItem>
             )}
           />
+          <small id="bidHelp" className="form-text text-muted">
+          Bid Amount will be deducted from wallet. It will be refunded if you are outbidded.</small>
         </section>
       </div>
     )

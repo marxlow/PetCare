@@ -25,8 +25,8 @@ class DashboardPage extends Component {
   });
 
   render() {
-    const { userId, role } = this.state;
-    if (!localStorage.getItem('role') || role === null) {
+    const { userId, role, pets } = this.state;
+    if ( !localStorage.getItem('role') || role === null ){
       localStorage.clear(); // Remove all key/value pair in localstorage
       this.props.history.push('/login');
     }
@@ -43,6 +43,7 @@ class DashboardPage extends Component {
               </div>
               <div className="d-flex flex-column align-items-center mt-4">
                 <h4>Bob</h4>
+                <h4>{role}</h4>
                 <h4>{userId}</h4>
               </div>
             </div>

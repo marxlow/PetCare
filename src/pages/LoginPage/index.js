@@ -42,9 +42,9 @@ class LoginPage extends Component {
         });
       }
     } catch (err) {
-      console.error("Unable to login. Invalid email or password. Error: " + err.message);
-      message.warn("Invalid email or password");
-      return;
+      console.error("Unable to login. Invalid email or password. Error: " + err.response.data)
+      message.warn("Invalid email or password")
+      return
     }
   });
 

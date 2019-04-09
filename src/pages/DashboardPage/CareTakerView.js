@@ -4,6 +4,7 @@ import axios from 'axios';
 import DateSection from './components/DateSection';
 
 const myServicesStub = ['HairDressing', 'NailCare', 'PetTraining']
+const allServicesStub = ['HairDressing', 'OutdoorStroll', 'NailCare', 'PetExercising', 'PetTraining']
 
 class CareTakerView extends Component {
   constructor(props) {
@@ -14,8 +15,8 @@ class CareTakerView extends Component {
       startDate: '',
       endDate: '',
       minAutoAcceptPrice: 99999999,
-      myServices: [],
-      allServices: [],
+      myServices: myServicesStub,
+      allServices: allServicesStub,
       newService: '',
     }
   }
@@ -25,16 +26,63 @@ class CareTakerView extends Component {
     await this.getDatesForCareTaker();
   }
 
-// //caretaker route request types: 
-// getWorkDates: get all confirmed bids 
-// ( input: email output: DateOfService, petownerEmail, price), 
+  // getWorkDates: get all confirmed bids 
+  // ( input: email output: DateOfService, petownerEmail, price), 
+  getWorkDates = (async () => {
+    const { userId } = this.state;
+    try {
+      const response = await axios.get('http://localhost:3030/caretaker', {
+        post: 'getWorkDates',
+        email: userId,
+      });
+      if (response.status === 200) {
+        const workDates = response.data;
+        this.setState({ workDates: workDates });
+        console.log("getWorkDates:", workDates);
+      }
+    } catch (err) {
+      console.error("Unable to get Work Dates. Error: " + err.response.data)
+    }
+  });
 
-// removeService: remove service 
-// ( input: array of services(?) output: all provided service(?)), 
-// getBids: get all available bid dates and current highest bid
-// ( input: email output: dates, current highest bid), 
-// acceptBid: accept current highest bid of a specific day
-// ( input: caretakerEmail, dateOfService output: petownerEmail, dateOfService, Price?)
+  // getBids: get all available bid dates and current highest bid
+  // ( input: email output: dates, email, current highest bid), 
+  getBids = (async () => {
+    const { userId } = this.state;
+    try {
+      const response = await axios.get('http://localhost:3030/caretaker', {
+        post: 'getBids',
+        email: userId,
+      });
+      if (response.status === 200) {
+        const bids = response.data;
+        this.setState({ bids: bids });
+        console.log("getBids:", bids);
+      }
+    } catch (err) {
+      console.error("Unable to get Bids. Error: " + err.response.data)
+    }
+  });
+
+  // acceptBid: accept current highest bid of a specific day
+  // ( input: caretakerEmail, dateOfService output: workDates)
+  acceptBid = (async () => {
+    const { userId, bid } = this.state;
+    try {
+      const response = await axios.get('http://localhost:3030/caretaker', {
+        post: 'acceptBid',
+        email: userId,
+        bid: bid,
+      });
+      if (response.status === 200) {
+        const workDates = response.data;
+        this.setState({ workDates: workDates });
+        console.log("acceptBid:", workDates);
+      }
+    } catch (err) {
+      console.error("Unable to get accept Bid. Error: " + err.response.data)
+    }
+  });
 
   // getAllService: get all available types service
   // ( input: nothing(?) output: all services)
@@ -76,19 +124,41 @@ class CareTakerView extends Component {
   // ( input: array of services(?) output: all provided service(?), 
   // Adds a new service to user's service from all services which user did not have
   addService = (async () => {
-    const { userId } = this.state;
+    const { userId, newService } = this.state;
     try {
       const response = await axios.get('http://localhost:3030/caretaker', {
         post: 'addService',
-        email: userId
+        email: userId,
+        service: newService,
       });
       if (response.status === 200) {
-        const myServices = response.data;
-        this.setState({ myServices: myServices });
-        console.log("New User's service:", myServices);
+        const nextMyServices = response.data;
+        this.setState({ myServices: nextMyServices });
+        console.log("New User's services:", nextMyServices);
       }
     } catch (err) {
       console.error("Unable to add User's service. Error: " + err.response.data)
+    }
+  });
+
+  // removeService: remove service 
+  // ( input: array of services(?) output: all provided service(?)),
+  removeService = (async () => {
+    const deleted = "NailCare"
+    const { userId, myServices } = this.state;
+    try {
+      const response = await axios.get('http://localhost:3030/caretaker', {
+        post: 'removeService',
+        email: userId,
+        service: deleted,
+      });
+      if (response.status === 200) {
+        const nextMyServices = response.data;
+        this.setState({ myServices: nextMyServices });
+        console.log("New User's services:", nextMyServices);
+      }
+    } catch (err) {
+      console.error("Unable to remove User's service. Error: " + err.response.data)
     }
   });
 
