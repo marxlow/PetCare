@@ -45,7 +45,7 @@ class LoginPage extends Component {
 
       // TODO: Depends on role from backend. To see owner view. Comment the code below and uncomment the next.
       // localStorage.setItem('role', 'caretaker'); 
-      // localStorage.setItem('role', 'owner')
+      // localStorage.setItem('role', 'owner');
       localStorage.setItem('role', role); 
 
       this.props.history.push({

@@ -3,6 +3,7 @@ import { Button, List } from 'antd';
 import axios from 'axios';
 import DateSection from './components/DateSection';
 
+const myServicesStub = ['HairDressing', 'NailCare', 'PetTraining']
 
 class CareTakerView extends Component {
   constructor(props) {
@@ -13,6 +14,9 @@ class CareTakerView extends Component {
       startDate: '',
       endDate: '',
       minAutoAcceptPrice: 99999999,
+      myServices: [],
+      allServices: [],
+      newService: '',
     }
   }
 
@@ -22,18 +26,9 @@ class CareTakerView extends Component {
   }
 
 // //caretaker route request types: 
-// getAvailability:previously added availabilities
-// ( input: email output: [{startdate, enddate, price}]) , 
 // getWorkDates: get all confirmed bids 
 // ( input: email output: DateOfService, petownerEmail, price), 
-// addAvailability: add avail
-// ( input: startdate, enddate, minAutoAcceptPrice, email output: startdate, enddate(?))
-// getAllService: get all available types service
-// ( input: nothing(?) output: all services)
-// getMyService: get my provided service
-// ( input: email output: all provided service(?)
-// addService: add service
-// ( input: array of services(?) output: all provided service(?), 
+
 // removeService: remove service 
 // ( input: array of services(?) output: all provided service(?)), 
 // getBids: get all available bid dates and current highest bid
@@ -41,12 +36,71 @@ class CareTakerView extends Component {
 // acceptBid: accept current highest bid of a specific day
 // ( input: caretakerEmail, dateOfService output: petownerEmail, dateOfService, Price?)
 
+  // getAllService: get all available types service
+  // ( input: nothing(?) output: all services)
+  getAllService = (async () => {
+    try {
+      const response = await axios.get('http://localhost:3030/caretaker', {
+        post: 'getAllService',
+      });
+      if (response.status === 200) {
+        const allServices = response.data;
+        this.setState({ allServices: allServices });
+        console.log("All services:", allServices);
+      }
+    } catch (err) {
+      console.error("Unable to get Services. Error: " + err.response.data)
+    }
+  });
+
+  // getMyService: get my provided service
+  // ( input: email output: all provided service(?)
+  getMyService = (async () => {
+    const { userId } = this.state;
+    try {
+      const response = await axios.get('http://localhost:3030/caretaker', {
+        post: 'getMyService',
+        email: userId
+      });
+      if (response.status === 200) {
+        const myServices = response.data;
+        this.setState({ myServices: myServices });
+        console.log("User's services:", myServices);
+      }
+    } catch (err) {
+      console.error("Unable to get User's services. Error: " + err.response.data)
+    }
+  });
+
+  // addService: add service
+  // ( input: array of services(?) output: all provided service(?), 
+  // Adds a new service to user's service from all services which user did not have
+  addService = (async () => {
+    const { userId } = this.state;
+    try {
+      const response = await axios.get('http://localhost:3030/caretaker', {
+        post: 'addService',
+        email: userId
+      });
+      if (response.status === 200) {
+        const myServices = response.data;
+        this.setState({ myServices: myServices });
+        console.log("New User's service:", myServices);
+      }
+    } catch (err) {
+      console.error("Unable to add User's service. Error: " + err.response.data)
+    }
+  });
+
+  // getAvailability:previously added availabilities
+  // ( input: email output: [{startdate, enddate, price}]) 
   // Make API call to fetch dates
   getDatesForCareTaker = (async () => {
     // TODO: @chiasin. Make API call for all availabilities
     // let response = {}
     // try {
-    //   response = await axios.get('http://localhost:3030/', {
+    //   response = await axios.get('http://localhost:3030/caretaker', {
+    //     post: 'getAvailability',
     //     email: this.state.userId,
     //   });
     // } catch (err) {
@@ -87,6 +141,9 @@ class CareTakerView extends Component {
     })
   });
 
+  // addAvailability: add avail
+  // ( input: startdate, enddate, minAutoAcceptPrice, email output: startdate, enddate(?))
+  // Add new availabilities, no duplicates and sort from earliest to latest 
   setAvailabilityForCareTaker = (async () => {
     const { startDate, endDate, minAutoAcceptPrice, availabilities } = this.state;
     console.log(startDate, endDate);
@@ -111,8 +168,6 @@ class CareTakerView extends Component {
       return self.indexOf(value) === index;
     });
 
-    console.log("Unsorted:", newAvailabilities)
-
     // Sort in order of Dates
     newAvailabilities.sort((a,b) => {
       if (!a || !b) { return; }
@@ -124,9 +179,7 @@ class CareTakerView extends Component {
       availabilities: newAvailabilities,
     })
 
-    console.log("Sorted:", this.state.availabilities)
-
-    //TODO: @chiasin. Make API call to set avilability.
+    //TODO: @chiasin. Make API call to set availability.
     // let response = {};
     // try {
     //   response = await axios.post('http://localhost:3030/caretaker', {
