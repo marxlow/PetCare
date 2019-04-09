@@ -12,6 +12,9 @@ class DashboardPage extends Component {
       role: localStorage.getItem('role'),
       userData: {},
       userName: 'UNKNOWN',
+      wallet: 0,
+      badges: [],
+      avgRating: 0,
     }
   }
 
@@ -30,6 +33,45 @@ class DashboardPage extends Component {
       }
     } catch (err) {
       console.error("Unable to get user name. Error: " + err.response.data)
+    }
+    // Get Wallet
+    try {
+      const response = await axios.post('http://localhost:3030/user/', {
+        post: 'getWallet',
+        email: userId,
+      });
+      if (response.status === 200) {
+        const wallet = response.data.wallet;
+        this.setState({ wallet });
+      }
+    } catch (err) {
+      console.error("Unable to get wallet. Error: " + err.response.data)
+    }
+    // Get Badges
+    try {
+      const response = await axios.post('http://localhost:3030/user/', {
+        post: 'getBadges',
+        email: userId,
+      });
+      if (response.status === 200) {
+        const badges = response.data.badges;
+        this.setState({ badges });
+      }
+    } catch (err) {
+      console.error("Unable to get Badges. Error: " + err.response.data)
+    }
+    //Get Avg rating for caretaker
+    try {
+      const response = await axios.post('http://localhost:3030/user/', {
+        post: 'getAvgRating',
+        email: userId,
+      });
+      if (response.status === 200) {
+        const avgRating = response.data.avgRating;
+        this.setState({ avgRating });
+      }
+    } catch (err) {
+      console.error("Unable to get Badges. Error: " + err.response.data)
     }
   }
 

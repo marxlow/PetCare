@@ -21,7 +21,7 @@ class CareTakerView extends Component {
     }
   }
 
-  // When component is loaded. Fetch all availbilities for care taker
+  // When component is loaded. Fetch all availabilities for care taker
   async componentDidMount() {
     await this.getDatesForCareTaker();
   }
