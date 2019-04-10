@@ -14,9 +14,13 @@ class DashboardPage extends Component {
       userName: 'UNKNOWN',
       wallet: 0,
       badges: { badge: '', descript: ''},
-      avgRating: 0,
+      avgRating: -1,
     }
   }
+
+  updateAvgRating = ((newRating) => {
+    this.setState({ avgRating: newRating });
+  });
 
   updateWallet = (async(value) => {
     //const valueStub = 123;
@@ -130,14 +134,17 @@ class DashboardPage extends Component {
                 <h5>{userId}</h5>
                 <h5>Badge: {badges.badge}</h5>
                 <h5>Wallet Amount: ${wallet}</h5>
-                <h5>{avgRating}</h5>
+                {role === 'Care Taker' ? 
+                  <h5>Rating: {avgRating}</h5>
+                  : null
+                }
               </div>
             </div>
             <div className="col-8">
               {role === 'Pet Owner' ?
                 <PetOwnerView userId={userId} />
                 :
-                <CareTakerView userId={userId} />
+                <CareTakerView userId={userId} updateAvgRating={this.updateAvgRating} />
               }
             </div>
           </div>

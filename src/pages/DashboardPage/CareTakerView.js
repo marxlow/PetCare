@@ -48,6 +48,8 @@ class CareTakerView extends Component {
         const avgRating = response.data.avgrating;
         this.setState({ avgRating });
         console.log("getAvgRating:", avgRating);
+        this.props.updateAvgRating(avgRating);
+        console.log("getAvgRating:", avgRating);
       }
     } catch (err) {
       console.error("Unable to get Average Rating. Error: " + err.response.data)
