@@ -238,7 +238,6 @@ class CareTakerView extends Component {
       console.error("Unable to get Availabilities. Error: " + err.response.data)
       message.warn("Unable to get Availabilities.");
     }
-    
 
     // const availabilityRangeStub = [
     //   { startDate: '2019-04-01', endDate: '2019-04-02' },
@@ -273,24 +272,62 @@ class CareTakerView extends Component {
   // ( input: startdate, enddate, minAutoAcceptPrice, email output: startdate, enddate(?))
   // Add new availabilities, no duplicates and sort from earliest to latest 
   setAvailabilityForCareTaker = (async () => {
-    const { startDate, endDate, autoAcceptedPrice, availabilities } = this.state;
+    const { startDate, endDate, autoAcceptedPrice } = this.state;
     console.log(startDate, endDate);
+    
+    // // TODO: Assumes all availability range are in the same month
+    // const yyyymm = startdate.slice(0, 8);
+    // const startDay = parseInt(startdate.split('-')[2]);
+    // const endDay = parseInt(enddate.split('-')[2]);
+    
+    // for (let j = startDay; j <= endDay; j++) {
+    //   if (j < 10) {
+    //     newAvailabilities.push(`${yyyymm}0${j}`);
+    //   } else {
+    //     newAvailabilities.push(`${yyyymm}${j}`);
+    //   }
+    // }
+
+    //TODO: @chiasin. Make API call to set availability.
+    const newAvailability = {
+      post: 'addAvailability',  
+      startDate,
+      endDate,
+      autoAcceptedPrice,
+      email: this.state.userId
+    }
+    let availabilities = []
+    try {
+      const response = await axios.post('http://localhost:3030/caretaker', newAvailability);
+      if (response.status === 200) {
+        availabilities = response.data.rows;
+        this.setState({ availabilities });
+        console.log("getAvailabilities:", availabilities);
+      }
+    } catch (err) {
+      console.error("Unable to set Availabilities. Error: " + err.response.data)
+      message.warn("Unable to add Availabilities", newAvailability);
+    }
 
     // Transform start and end dates to be day by day
-    let newAvailabilities = Object.assign([], availabilities);
-    
-    // TODO: Assumes all availability range are in the same month
-    const yyyymm = startDate.slice(0, 8);
-    const startDay = parseInt(startDate.split('-')[2]);
-    const endDay = parseInt(endDate.split('-')[2]);
-    
-    for (let j = startDay; j <= endDay; j++) {
-      if (j < 10) {
-        newAvailabilities.push(`${yyyymm}0${j}`);
-      } else {
-        newAvailabilities.push(`${yyyymm}${j}`);
+    let newAvailabilities = [];
+
+    // TODO: Assumes all availbility range are in the same month
+    for (let i = 0; i < availabilities.length; i++) {
+      const range = availabilities[i];
+      const yyyymm = range.startdate.slice(0, 8);
+      const startDay = parseInt(range.startdate.split('-')[2]);
+      const endDay = parseInt(range.enddate.split('-')[2]);
+
+      for (let j = startDay; j <= endDay; j++) {
+        if (j < 10) {
+          newAvailabilities.push(`${yyyymm}0${j}`);
+        } else {
+          newAvailabilities.push(`${yyyymm}${j}`);
+        }
       }
     }
+
     // Remove Duplicates
     newAvailabilities = newAvailabilities.filter((value, index, self) => {
       return self.indexOf(value) === index;
@@ -306,26 +343,6 @@ class CareTakerView extends Component {
     this.setState({
       availabilities: newAvailabilities,
     })
-
-    //TODO: @chiasin. Make API call to set availability.
-    const newAvailability = {
-      post: 'addAvailability',  
-      startDate,
-      endDate,
-      autoAcceptedPrice,
-      email: this.state.userId
-    }
-    try {
-      const response = await axios.post('http://localhost:3030/caretaker', newAvailability);
-      if (response.status === 200) {
-        const availabilities = response.data.rows;
-          this.setState({ availabilities });
-          console.log("getAvailabilities:", availabilities);
-      }
-    } catch (err) {
-      console.error("Unable to set Availabilities. Error: " + err.response.data)
-      message.warn("Unable to add Availabilities", newAvailability);
-    }
 
     // TODO: @chiasin. Refresh availbilities.
     // await this.getDatesForCareTaker();
