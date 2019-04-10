@@ -82,22 +82,6 @@ class DashboardPage extends Component {
     } catch (err) {
       console.error("Unable to get Badges. Error: " + err.response.data)
     }
-    
-    // if (role === 'Care Taker') {
-    //   //Get Avg rating for caretaker
-    //   try {
-    //     const response = await axios.post('http://localhost:3030/caretaker/', {
-    //       post: 'getAvgRating',
-    //       email: userId,
-    //     });
-    //     if (response.status === 200) {
-    //       const avgRating = response.data.avgRating;
-    //       this.setState({ avgRating });
-    //     }
-    //   } catch (err) {
-    //     console.error("Unable to get avgRating. Error: " + err.response.data)
-    //   }
-    // }
   }
 
   onLogout = ((e) => {

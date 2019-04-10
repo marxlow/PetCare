@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, List, Tabs, message } from 'antd';
+import { Button, List, Tabs, message, InputNumber } from 'antd';
 import axios from 'axios';
 import DateSection from './components/DateSection';
 
@@ -25,6 +25,10 @@ class CareTakerView extends Component {
     }
   }
 
+  updateAutoAcceptedPrice = ((value) => {
+    this.setState({ autoAcceptedPrice: value });
+  });
+
   // When component is loaded. Fetch all availabilities for care taker
   async componentDidMount() {
     await this.getDatesForCareTaker();
@@ -47,12 +51,11 @@ class CareTakerView extends Component {
       if (response.status === 200) {
         const avgRating = response.data.avgrating;
         this.setState({ avgRating });
-        console.log("getAvgRating:", avgRating);
         this.props.updateAvgRating(avgRating);
-        console.log("getAvgRating:", avgRating);
       }
     } catch (err) {
       console.error("Unable to get Average Rating. Error: " + err.response.data)
+      message.warn("Unable to get Average Rating");
     }
   });
 
@@ -220,7 +223,7 @@ class CareTakerView extends Component {
   // ( input: email output: [{startdate, enddate, price}]) 
   // Make API call to fetch dates
   getDatesForCareTaker = (async () => {
-    const availabilities = []
+    let availabilities = []
     // TODO: @chiasin. Make API call for all availabilities
     try {
       const response = await axios.post('http://localhost:3030/caretaker', {
@@ -237,10 +240,10 @@ class CareTakerView extends Component {
     }
     
 
-    const availabilityRangeStub = [
-      { startDate: '2019-04-01', endDate: '2019-04-02' },
-      { startDate: '2019-04-05', endDate: '2019-04-10' },
-    ]
+    // const availabilityRangeStub = [
+    //   { startDate: '2019-04-01', endDate: '2019-04-02' },
+    //   { startDate: '2019-04-05', endDate: '2019-04-10' },
+    // ]
 
     // Transform start and end dates to be day by day
     const availabilitiesStub = [];
@@ -248,9 +251,9 @@ class CareTakerView extends Component {
     // TODO: Assumes all availbility range are in the same month
     for (let i = 0; i < availabilities.length; i++) {
       const range = availabilities[i];
-      const yyyymm = range.startDate.slice(0, 8);
-      const startDay = parseInt(range.startDate.split('-')[2]);
-      const endDay = parseInt(range.endDate.split('-')[2]);
+      const yyyymm = range.startdate.slice(0, 8);
+      const startDay = parseInt(range.startdate.split('-')[2]);
+      const endDay = parseInt(range.enddate.split('-')[2]);
 
       for (let j = startDay; j <= endDay; j++) {
         if (j < 10) {
@@ -345,6 +348,14 @@ class CareTakerView extends Component {
             <section className="col-6">
               <h3>Add your availabilities here</h3>
               <DateSection changeDate={this.changeDate} title={""} />
+              <InputNumber
+                  defaultValue={1000}
+                  className={"w-100"}
+                  size={'large'}
+                  formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  parser={value => value.replace(/\$\s?|(,*)/g, '')}
+                  onChange={this.updateAutoAcceptedPrice}
+                />
               <Button className="mt-4" onClick={this.setAvailabilityForCareTaker}>Add new Availability</Button>
             </section>
             <section className="col-6">
