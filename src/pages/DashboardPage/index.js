@@ -13,14 +13,32 @@ class DashboardPage extends Component {
       userData: {},
       userName: 'UNKNOWN',
       wallet: 0,
-      badges: [],
+      badges: { badge: '', descript: ''},
       avgRating: 0,
     }
   }
 
+  updateWallet = (async(value) => {
+    //const valueStub = 123;
+    const { userId } = this.state;
+    try {
+      const response = await axios.post('http://localhost:3030/wallet/', {
+        post: 'updateWallet',
+        amt: value,
+        email: userId,
+      });
+      if (response.status === 200) {
+        const avgRating = response.data.avgRating;
+        this.setState({ avgRating });
+      }
+    } catch (err) {
+      console.error("Unable to get Badges. Error: " + err.response.data)
+    }
+  });
+
   // When component is loaded. Fetch Name and badges for User and avg ratings for caretaker 
   async componentDidMount() {
-    const { userId } = this.state;
+    const { userId, role } = this.state;
     // Get Username
     try {
       const response = await axios.post('http://localhost:3030/user/', {
@@ -36,43 +54,46 @@ class DashboardPage extends Component {
     }
     // Get Wallet
     try {
-      const response = await axios.post('http://localhost:3030/user/', {
+      const response = await axios.post('http://localhost:3030/wallet/', {
         post: 'getWallet',
         email: userId,
       });
       if (response.status === 200) {
-        const wallet = response.data.wallet;
+        const wallet = response.data.rows[0].walletamt;
         this.setState({ wallet });
-      }
+      } 
     } catch (err) {
       console.error("Unable to get wallet. Error: " + err.response.data)
     }
     // Get Badges
     try {
       const response = await axios.post('http://localhost:3030/user/', {
-        post: 'getBadges',
+        post: 'getBadge',
         email: userId,
       });
       if (response.status === 200) {
-        const badges = response.data.badges;
+        const badges = response.data;
         this.setState({ badges });
       }
     } catch (err) {
       console.error("Unable to get Badges. Error: " + err.response.data)
     }
-    //Get Avg rating for caretaker
-    try {
-      const response = await axios.post('http://localhost:3030/user/', {
-        post: 'getAvgRating',
-        email: userId,
-      });
-      if (response.status === 200) {
-        const avgRating = response.data.avgRating;
-        this.setState({ avgRating });
-      }
-    } catch (err) {
-      console.error("Unable to get Badges. Error: " + err.response.data)
-    }
+    
+    // if (role === 'Care Taker') {
+    //   //Get Avg rating for caretaker
+    //   try {
+    //     const response = await axios.post('http://localhost:3030/caretaker/', {
+    //       post: 'getAvgRating',
+    //       email: userId,
+    //     });
+    //     if (response.status === 200) {
+    //       const avgRating = response.data.avgRating;
+    //       this.setState({ avgRating });
+    //     }
+    //   } catch (err) {
+    //     console.error("Unable to get avgRating. Error: " + err.response.data)
+    //   }
+    // }
   }
 
   onLogout = ((e) => {
@@ -87,7 +108,7 @@ class DashboardPage extends Component {
   });
 
   render() {
-    const { userId, role, userName } = this.state;
+    const { userId, role, userName, badges, wallet } = this.state;
     if ( !localStorage.getItem('role') || role === null ){
       localStorage.clear(); // Remove all key/value pair in localstorage
       this.props.history.push('/login');
@@ -107,6 +128,8 @@ class DashboardPage extends Component {
                 <h4>{userName}</h4>
                 <h4>{role}</h4>
                 <h4>{userId}</h4>
+                <h4>Badge: {badges.badge}</h4>
+                <h4>Wallet Amount: ${wallet}</h4>
               </div>
             </div>
             <div className="col-8">

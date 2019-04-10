@@ -20,16 +20,62 @@ class CareTakerView extends Component {
       myServices: myServicesStub,
       allServices: allServicesStub,
       newService: '',
+      reviews: [],
+      avgRating: 0,
     }
   }
 
   // When component is loaded. Fetch all availabilities for care taker
   async componentDidMount() {
     await this.getDatesForCareTaker();
+    await this.getAvgRating();
+    // await this.getWorkDates();
+    // await this.getAllService();
+    // await this.getMyService();
   }
 
+  //Done
+  // getAvgRating: get all confirmed bids 
+  // ( input: email output: [avgrating]), 
+  getAvgRating = (async () => {
+    const { userId } = this.state;
+    try {
+      const response = await axios.get('http://localhost:3030/caretaker', {
+        post: 'getAvgRating',
+        email: userId,
+      });
+      if (response.status === 200) {
+        const avgRating = response.data.avgrating;
+        this.setState({ avgRating });
+        console.log("getAvgRating:", avgRating);
+      }
+    } catch (err) {
+      console.error("Unable to get Average Rating. Error: " + err.response.data)
+    }
+  });
+
+  // getReviews: get all confirmed bids 
+  // ( input: email output: [review, rating, byuser, timestamp]), 
+  getReviews = (async () => {
+    const { userId } = this.state;
+    try {
+      const response = await axios.get('http://localhost:3030/review', {
+        post: 'getReviews',
+        email: userId,
+      });
+      if (response.status === 200) {
+        const reviews = response.data.reviews;
+        this.setState({ reviews: reviews });
+        console.log("getWorkDates:", reviews);
+      }
+    } catch (err) {
+      console.error("Unable to get Work Dates. Error: " + err.response.data)
+    }
+  });
+
+  //Done
   // getWorkDates: get all confirmed bids 
-  // ( input: email output: DateOfService, petownerEmail, price), 
+  // ( input: email output: [DateOfService, petownerEmail, price]), 
   getWorkDates = (async () => {
     const { userId } = this.state;
     try {
@@ -38,7 +84,7 @@ class CareTakerView extends Component {
         email: userId,
       });
       if (response.status === 200) {
-        const workDates = response.data;
+        const workDates = response.data.rows;
         this.setState({ workDates: workDates });
         console.log("getWorkDates:", workDates);
       }
@@ -48,7 +94,7 @@ class CareTakerView extends Component {
   });
 
   // getBids: get all available bid dates and current highest bid
-  // ( input: email output: dates, email, current highest bid), 
+  // ( input: email output: [dates, email, current highest bid]), 
   getBids = (async () => {
     const { userId } = this.state;
     try {
@@ -57,7 +103,7 @@ class CareTakerView extends Component {
         email: userId,
       });
       if (response.status === 200) {
-        const bids = response.data;
+        const bids = response.data.bids;
         this.setState({ bids: bids });
         console.log("getBids:", bids);
       }
@@ -67,7 +113,7 @@ class CareTakerView extends Component {
   });
 
   // acceptBid: accept current highest bid of a specific day
-  // ( input: caretakerEmail, dateOfService output: workDates)
+  // ( input: caretakerEmail, dateOfService output: [DateOfService, petownerEmail, price])
   acceptBid = (async () => {
     const { userId, bid } = this.state;
     try {
@@ -77,7 +123,7 @@ class CareTakerView extends Component {
         bid: bid,
       });
       if (response.status === 200) {
-        const workDates = response.data;
+        const workDates = response.data.bids;
         this.setState({ workDates: workDates });
         console.log("acceptBid:", workDates);
       }
@@ -86,6 +132,7 @@ class CareTakerView extends Component {
     }
   });
 
+  //Done
   // getAllService: get all available types service
   // ( input: nothing(?) output: all services)
   getAllService = (async () => {
@@ -94,7 +141,7 @@ class CareTakerView extends Component {
         post: 'getAllService',
       });
       if (response.status === 200) {
-        const allServices = response.data;
+        const allServices = response.data.rows;
         this.setState({ allServices: allServices });
         console.log("All services:", allServices);
       }
@@ -103,6 +150,7 @@ class CareTakerView extends Component {
     }
   });
 
+  //Done
   // getMyService: get my provided service
   // ( input: email output: all provided service(?)
   getMyService = (async () => {
@@ -113,7 +161,7 @@ class CareTakerView extends Component {
         email: userId
       });
       if (response.status === 200) {
-        const myServices = response.data;
+        const myServices = response.data.rows;
         this.setState({ myServices: myServices });
         console.log("User's services:", myServices);
       }
@@ -122,6 +170,7 @@ class CareTakerView extends Component {
     }
   });
 
+  //Done Unattached
   // addService: add service
   // ( input: array of services(?) output: all provided service(?), 
   // Adds a new service to user's service from all services which user did not have
@@ -134,7 +183,7 @@ class CareTakerView extends Component {
         service: newService,
       });
       if (response.status === 200) {
-        const nextMyServices = response.data;
+        const nextMyServices = response.data.rows;
         this.setState({ myServices: nextMyServices });
         console.log("New User's services:", nextMyServices);
       }
@@ -143,9 +192,10 @@ class CareTakerView extends Component {
     }
   });
 
+  //Done Unattached
   // removeService: remove service 
   // ( input: array of services(?) output: all provided service(?)),
-  removeService = (async () => {
+  removeService = (async (event, value) => {
     const deleted = "NailCare"
     const { userId, myServices } = this.state;
     try {
@@ -155,7 +205,7 @@ class CareTakerView extends Component {
         service: deleted,
       });
       if (response.status === 200) {
-        const nextMyServices = response.data;
+        const nextMyServices = response.data.rows;
         this.setState({ myServices: nextMyServices });
         console.log("New User's services:", nextMyServices);
       }
