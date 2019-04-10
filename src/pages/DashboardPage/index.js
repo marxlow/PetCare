@@ -108,7 +108,7 @@ class DashboardPage extends Component {
   });
 
   render() {
-    const { userId, role, userName, badges, wallet } = this.state;
+    const { userId, role, userName, badges, wallet, avgRating } = this.state;
     if ( !localStorage.getItem('role') || role === null ){
       localStorage.clear(); // Remove all key/value pair in localstorage
       this.props.history.push('/login');
@@ -125,11 +125,12 @@ class DashboardPage extends Component {
                 <img className="card-img-top rounded-circle" src="https://www.freeiconspng.com/uploads/jake-the-dog-cartoon-characters-adventure-time-png--18.png" alt="profile" />
               </div>
               <div className="d-flex flex-column align-items-center mt-4">
-                <h4>{userName}</h4>
-                <h4>{role}</h4>
-                <h4>{userId}</h4>
-                <h4>Badge: {badges.badge}</h4>
-                <h4>Wallet Amount: ${wallet}</h4>
+                <h5>{userName}</h5>
+                <h5>{role}</h5>
+                <h5>{userId}</h5>
+                <h5>Badge: {badges.badge}</h5>
+                <h5>Wallet Amount: ${wallet}</h5>
+                <h5>{avgRating}</h5>
               </div>
             </div>
             <div className="col-8">
