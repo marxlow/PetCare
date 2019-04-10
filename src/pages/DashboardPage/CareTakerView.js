@@ -304,7 +304,7 @@ class CareTakerView extends Component {
       if (response.status === 200) {
         availabilities = response.data.rows;
         this.setState({ availabilities });
-        console.log("getAvailabilities:", availabilities);
+        console.log("addAvailability:", availabilities);
       }
     } catch (err) {
       console.error("Unable to set Availabilities. Error: " + err.response.data)
