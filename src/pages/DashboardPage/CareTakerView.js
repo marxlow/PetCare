@@ -4,6 +4,8 @@ import axios from 'axios';
 import DateSection from './components/DateSection';
 
 const TabPane = Tabs.TabPane;
+const ListItem = List.Item;
+const ListItemMeta = ListItem.Meta;
 
 const myServicesStub = ['HairDressing', 'NailCare', 'PetTraining']
 const allServicesStub = ['HairDressing', 'OutdoorStroll', 'NailCare', 'PetExercising', 'PetTraining']
@@ -16,7 +18,7 @@ class CareTakerView extends Component {
       availabilities: [],
       startDate: '',
       endDate: '',
-      autoAcceptedPrice: 99999999,
+      autoAcceptedPrice: 1000,
       myServices: myServicesStub,
       allServices: allServicesStub,
       newService: '',
@@ -233,7 +235,7 @@ class CareTakerView extends Component {
       if (response.status === 200) {
         availabilities = response.data.rows;
         console.log("getAvailabilities:", availabilities);
-      }
+      } 
     } catch (err) {
       console.error("Unable to get Availabilities. Error: " + err.response.data)
       message.warn("Unable to get Availabilities.");
@@ -272,7 +274,7 @@ class CareTakerView extends Component {
   // ( input: startdate, enddate, minAutoAcceptPrice, email output: startdate, enddate(?))
   // Add new availabilities, no duplicates and sort from earliest to latest 
   setAvailabilityForCareTaker = (async () => {
-    const { startDate, endDate, autoAcceptedPrice } = this.state;
+    const { startDate, endDate, autoAcceptedPrice, userId } = this.state;
     console.log(startDate, endDate);
     
     // // TODO: Assumes all availability range are in the same month
@@ -294,7 +296,7 @@ class CareTakerView extends Component {
       startDate,
       endDate,
       autoAcceptedPrice,
-      email: this.state.userId
+      email: userId
     }
     let availabilities = []
     try {
@@ -347,6 +349,63 @@ class CareTakerView extends Component {
     // TODO: @chiasin. Refresh availbilities.
     // await this.getDatesForCareTaker();
   });
+  
+  //removeAvailabilities: remove availabilities 
+  //(input: email, {date(yyyy-mm-dd format)} output: {startdate, enddate, price})
+  removeAvailabilities = (async (date) => {
+    const { userId } = this.state;
+    let availabilities = []
+    try {
+      const response = await axios.post('http://localhost:3030/caretaker', {
+        post: 'removeAvailabilities',
+        email: userId,
+        date,
+      });
+      if (response.status === 200) {
+        availabilities = response.data.rows;
+        this.setState({ availabilities });
+        console.log("removeAvailabilities:", availabilities);
+      }
+    } catch (err) {
+      console.error("Unable to remove Availabilities. Error: " + err.response.data)
+      message.warn("Unable to remove Availability", date);
+    }
+
+    // Transform start and end dates to be day by day
+    let newAvailabilities = [];
+
+    // TODO: Assumes all availbility range are in the same month
+    for (let i = 0; i < availabilities.length; i++) {
+      const range = availabilities[i];
+      const yyyymm = range.startdate.slice(0, 8);
+      const startDay = parseInt(range.startdate.split('-')[2]);
+      const endDay = parseInt(range.enddate.split('-')[2]);
+
+      for (let j = startDay; j <= endDay; j++) {
+        if (j < 10) {
+          newAvailabilities.push(`${yyyymm}0${j}`);
+        } else {
+          newAvailabilities.push(`${yyyymm}${j}`);
+        }
+      }
+    }
+
+    // Remove Duplicates
+    newAvailabilities = newAvailabilities.filter((value, index, self) => {
+      return self.indexOf(value) === index;
+    });
+
+    // Sort in order of Dates
+    newAvailabilities.sort((a,b) => {
+      if (!a || !b) { return; }
+      // Turn your strings into dates, and then s ubtract them
+      // to get a value that is either negative, positive, or zero.
+      return new Date(a) - new Date(b);
+    });
+    this.setState({
+      availabilities: newAvailabilities,
+    })
+  });
 
   // Called when the calendar gets updated
   changeDate = ((startDate, endDate) => {
@@ -366,7 +425,7 @@ class CareTakerView extends Component {
               <h3>Add your availabilities here</h3>
               <DateSection changeDate={this.changeDate} title={""} />
               <InputNumber
-                  defaultValue={1000}
+                  defaultValue={this.state.autoAcceptedPrice}
                   className={"w-100"}
                   size={'large'}
                   formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
@@ -376,10 +435,15 @@ class CareTakerView extends Component {
               <Button className="mt-4" onClick={this.setAvailabilityForCareTaker}>Add new Availability</Button>
             </section>
             <section className="col-6">
-              <h3>List of availabilities</h3>
+              <h3>List of Availabilities</h3>
               <List
                 dataSource={this.state.availabilities}
-                renderItem={(item) => (<List.Item>{item}</List.Item>)}
+                renderItem={(item) => (
+                  <List.Item>
+                    <ListItemMeta title={item} />
+                    <Button icon="delete" onClick={(() => this.removeAvailabilities(item))}>Delete Availability</Button>
+                  </List.Item>
+                )}
               />
             </section>
           </div>
