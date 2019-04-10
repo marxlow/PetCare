@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, List, Tabs } from 'antd';
+import { Button, List, Tabs, message } from 'antd';
 import axios from 'axios';
 import DateSection from './components/DateSection';
 
@@ -16,12 +16,12 @@ class CareTakerView extends Component {
       availabilities: [],
       startDate: '',
       endDate: '',
-      minAutoAcceptPrice: 99999999,
+      autoAcceptedPrice: 99999999,
       myServices: myServicesStub,
       allServices: allServicesStub,
       newService: '',
       reviews: [],
-      avgRating: 0,
+      avgRating: -2,
     }
   }
 
@@ -40,7 +40,7 @@ class CareTakerView extends Component {
   getAvgRating = (async () => {
     const { userId } = this.state;
     try {
-      const response = await axios.get('http://localhost:3030/caretaker', {
+      const response = await axios.post('http://localhost:3030/caretaker', {
         post: 'getAvgRating',
         email: userId,
       });
@@ -61,7 +61,7 @@ class CareTakerView extends Component {
   getReviews = (async () => {
     const { userId } = this.state;
     try {
-      const response = await axios.get('http://localhost:3030/review', {
+      const response = await axios.post('http://localhost:3030/review', {
         post: 'getReviews',
         email: userId,
       });
@@ -71,7 +71,7 @@ class CareTakerView extends Component {
         console.log("getWorkDates:", reviews);
       }
     } catch (err) {
-      console.error("Unable to get Work Dates. Error: " + err.response.data)
+      console.error("Unable to get Reviews. Error: " + err.response.data)
     }
   });
 
@@ -81,7 +81,7 @@ class CareTakerView extends Component {
   getWorkDates = (async () => {
     const { userId } = this.state;
     try {
-      const response = await axios.get('http://localhost:3030/caretaker', {
+      const response = await axios.post('http://localhost:3030/caretaker', {
         post: 'getWorkDates',
         email: userId,
       });
@@ -100,7 +100,7 @@ class CareTakerView extends Component {
   getBids = (async () => {
     const { userId } = this.state;
     try {
-      const response = await axios.get('http://localhost:3030/caretaker', {
+      const response = await axios.post('http://localhost:3030/caretaker', {
         post: 'getBids',
         email: userId,
       });
@@ -119,7 +119,7 @@ class CareTakerView extends Component {
   acceptBid = (async () => {
     const { userId, bid } = this.state;
     try {
-      const response = await axios.get('http://localhost:3030/caretaker', {
+      const response = await axios.post('http://localhost:3030/caretaker', {
         post: 'acceptBid',
         email: userId,
         bid: bid,
@@ -139,7 +139,7 @@ class CareTakerView extends Component {
   // ( input: nothing(?) output: all services)
   getAllService = (async () => {
     try {
-      const response = await axios.get('http://localhost:3030/caretaker', {
+      const response = await axios.post('http://localhost:3030/caretaker', {
         post: 'getAllService',
       });
       if (response.status === 200) {
@@ -158,7 +158,7 @@ class CareTakerView extends Component {
   getMyService = (async () => {
     const { userId } = this.state;
     try {
-      const response = await axios.get('http://localhost:3030/caretaker', {
+      const response = await axios.post('http://localhost:3030/caretaker', {
         post: 'getMyService',
         email: userId
       });
@@ -179,7 +179,7 @@ class CareTakerView extends Component {
   addService = (async () => {
     const { userId, newService } = this.state;
     try {
-      const response = await axios.get('http://localhost:3030/caretaker', {
+      const response = await axios.post('http://localhost:3030/caretaker', {
         post: 'addService',
         email: userId,
         service: newService,
@@ -201,7 +201,7 @@ class CareTakerView extends Component {
     const deleted = "NailCare"
     const { userId, myServices } = this.state;
     try {
-      const response = await axios.get('http://localhost:3030/caretaker', {
+      const response = await axios.post('http://localhost:3030/caretaker', {
         post: 'removeService',
         email: userId,
         service: deleted,
@@ -220,21 +220,22 @@ class CareTakerView extends Component {
   // ( input: email output: [{startdate, enddate, price}]) 
   // Make API call to fetch dates
   getDatesForCareTaker = (async () => {
+    const availabilities = []
     // TODO: @chiasin. Make API call for all availabilities
-    // let response = {}
-    // try {
-    //   response = await axios.get('http://localhost:3030/caretaker', {
-    //     post: 'getAvailability',
-    //     email: this.state.userId,
-    //   });
-    // } catch (err) {
-    //   console.error("Unable to get Availabilities. Error: " + err.response.data)
-    // }
-    // if (response.status === 200) {
-    //   const { startdate, enddate, price } = response.data;
-    // } else {
-    //   console.error("Unable to get Availabilities. Status: " + response.status)
-    // }
+    try {
+      const response = await axios.post('http://localhost:3030/caretaker', {
+        post: 'getAvailability',
+        email: this.state.userId,
+      });
+      if (response.status === 200) {
+        availabilities = response.data.rows;
+        console.log("getAvailabilities:", availabilities);
+      }
+    } catch (err) {
+      console.error("Unable to get Availabilities. Error: " + err.response.data)
+      message.warn("Unable to get Availabilities.");
+    }
+    
 
     const availabilityRangeStub = [
       { startDate: '2019-04-01', endDate: '2019-04-02' },
@@ -245,8 +246,8 @@ class CareTakerView extends Component {
     const availabilitiesStub = [];
 
     // TODO: Assumes all availbility range are in the same month
-    for (let i = 0; i < availabilityRangeStub.length; i++) {
-      const range = availabilityRangeStub[i];
+    for (let i = 0; i < availabilities.length; i++) {
+      const range = availabilities[i];
       const yyyymm = range.startDate.slice(0, 8);
       const startDay = parseInt(range.startDate.split('-')[2]);
       const endDay = parseInt(range.endDate.split('-')[2]);
@@ -269,7 +270,7 @@ class CareTakerView extends Component {
   // ( input: startdate, enddate, minAutoAcceptPrice, email output: startdate, enddate(?))
   // Add new availabilities, no duplicates and sort from earliest to latest 
   setAvailabilityForCareTaker = (async () => {
-    const { startDate, endDate, minAutoAcceptPrice, availabilities } = this.state;
+    const { startDate, endDate, autoAcceptedPrice, availabilities } = this.state;
     console.log(startDate, endDate);
 
     // Transform start and end dates to be day by day
@@ -304,24 +305,25 @@ class CareTakerView extends Component {
     })
 
     //TODO: @chiasin. Make API call to set availability.
-    // let response = {};
-    // try {
-    //   response = await axios.post('http://localhost:3030/caretaker', {
-    //     post: 'addAvailability',  
-    //     startDate,
-    //     endDate,
-    //     minAutoAcceptPrice,
-    //     email: this.state.userId
-    //   });
-    // } catch (err) {
-    //   console.error("Unable to set Availabilities. Error: " + err.response.data)
-    // }
-    // if (response.status === 200) {
-    //   const { startdate, enddate } = response.data;
-    // } else {
-    //   console.error("Unable to set Availabilities. Status: " + response.status)
-    // }
-    
+    const newAvailability = {
+      post: 'addAvailability',  
+      startDate,
+      endDate,
+      autoAcceptedPrice,
+      email: this.state.userId
+    }
+    try {
+      const response = await axios.post('http://localhost:3030/caretaker', newAvailability);
+      if (response.status === 200) {
+        const availabilities = response.data.rows;
+          this.setState({ availabilities });
+          console.log("getAvailabilities:", availabilities);
+      }
+    } catch (err) {
+      console.error("Unable to set Availabilities. Error: " + err.response.data)
+      message.warn("Unable to add Availabilities", newAvailability);
+    }
+
     // TODO: @chiasin. Refresh availbilities.
     // await this.getDatesForCareTaker();
   });
