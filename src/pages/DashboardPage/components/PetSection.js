@@ -143,6 +143,19 @@ class PetSection extends Component {
   // Delete Pets
   deletePet = (async (pid) => {
     const { userId } = this.state;
+    try {
+      const response = await axios.post('http://localhost:3030/petsection/', {
+        email: userId,
+        pid,
+      });
+      if (response.status === 200) {
+        const pets = response.data.rows;
+        this.setState({ pets, alert: `Success! Deleted pet of pid: ${pid}` });
+      }
+    } catch (err) {
+      console.error("Unable to delete pet in Database for user. Error: " + err.response.data);
+      this.setState({ alert: 'error' });
+    }
   });
 
   // Closing of Alert
