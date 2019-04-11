@@ -105,6 +105,7 @@ class CurrentBidsSection extends Component {
             )
           })}
         />
+        {/* Modal to add Bid */}
         <Modal
           title={`Bid: ${selectedBid.currenttopbidamt}`}
           visible={showModal}
