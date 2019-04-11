@@ -19,23 +19,32 @@ class CurrentBidsSection extends Component {
 
   // When component first loads, find all bids belonging to current user
   async componentDidMount() {
+    await this.getCurrentBids();
+  }
+
+  // Get bids the current pet owners has which are not accepted or outbidded
+  // input : email(pet owner),
+  // output : [{ caretakeremail,
+  // highestBidderEmail, currentTopbidamt( status = 'current highest') ,
+  // dateofservice,
+  // timestampByHighest,  }]
+  getCurrentBids = (async () => {
     const { userId } = this.state;
-    // Get bids the current pet owners has which are not accepted or outbidded
     try {
-      const response = await axios.post('http://localhost:3030/caretaker', {
-        post: 'getPetOwnerBids',
+      const response = await axios.post('http://localhost:3030/search', {
+        post: 'getCurrentBids',
         email: userId,
       });
       if (response.status === 200) {
         const bids = response.data;
         this.setState({ bids: bids });
-        console.log("getBids:", bids);
+        console.log("getCurrentBids:", bids);
       }
     } catch (err) {
       console.error("Unable to get Bids. Error: " + err.response.data)
       message.warn("Unable to get Bids");
     }
-  }
+  });
 
   // Called before updating bid
   openModal(bidObj) {
@@ -43,25 +52,26 @@ class CurrentBidsSection extends Component {
   }
 
   // Add bids and return the updated bids the current pet owners has which are not accepted or outbidded
-  updateBid = (async (bid, event) => {
+  updateBid = (async () => {
     //bid = {"bid":1,"dateofservice":"2018-12-31T16:00:00.000Z","bidderemail":"po@hotmail.com","bidamount":100}
-    const { userId, newamount } = this.state;
+    const { userId, newamount, selectedBid } = this.state;
+    const { caretakeremail, dateofservice } = selectedBid;
     try {
-      const response = await axios.post('http://localhost:3030/caretaker', {
-        post: 'updateBid',
-        email: bid.careTaker,
+      const response = await axios.post('http://localhost:3030/search', {
+        post: 'addBid',
+        caretakeremail,
+        petownerEmail: userId,
+        dateofservice,
         bidamount: newamount,
       });
       if (response.status === 200) {
-        const workDates = response.data.workdates;
-        const availabilities = response.data.availabilities;
-        this.setState({ availabilities, workDates });
-        console.log("acceptBid:", workDates);
+        message.warn("Bidding Successful");
       }
     } catch (err) {
-      console.error("Unable to accept Bid. Error: " + err.response.data)
-      message.warn("Unable to accept Bid");
+      console.error("Unable to Bid. Error: " + err.response.data)
+      message.warn("Unable to Bid");
     }
+    await this.getCurrentBids();
   });
 
   handleCancel = (() => {
@@ -100,14 +110,14 @@ class CurrentBidsSection extends Component {
           onOk={this.updateBid}
           onCancel={this.handleCancel}
         >
-        <InputNumber
-                  defaultValue={0}
-                  className={"w-100"}
-                  size={'large'}
-                  formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                  parser={value => value.replace(/\$\s?|(,*)/g, '')}
-                  onChange={this.updateBidAmount}
-                />
+          <InputNumber
+                    defaultValue={0}
+                    className={"w-100"}
+                    size={'large'}
+                    formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                    parser={value => value.replace(/\$\s?|(,*)/g, '')}
+                    onChange={this.updateBidAmount}
+                  />
         </Modal>
       </div >
     )

@@ -66,6 +66,7 @@ class SearchCareTakerSection extends Component {
     this.setState({ caretakers: newCaretakers });
   })
 
+  // Adding bid for search results
   addBid = (async (caretakeremail, date, key) => {
     const { email, caretakers } = this.state;
     const bidamount = caretakers[key].bidamount;
@@ -79,9 +80,10 @@ class SearchCareTakerSection extends Component {
         bidamount,
       });
       if (response.status === 200) {
-        const caretakers = response.data;
-        console.log('> Loaded caretakers', caretakers);
-        this.setState({ caretakers });
+        // const caretakers = response.data;
+        // console.log('> Loaded caretakers', caretakers);
+        // this.setState({ caretakers });
+        message.warn("Bidding Successful");
       }
     } catch (error) {
       message.warn(`Error Adding Bid`);
