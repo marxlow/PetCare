@@ -71,7 +71,6 @@ class SearchCareTakerSection extends Component {
     const { email, caretakers } = this.state;
     const bidamount = caretakers[key].bidamount;
     try {
-      // Fetch pets for user
       const response = await axios.post('http://localhost:3030/search/', {
         post: 'addBid',
         caretakeremail,
@@ -94,7 +93,6 @@ class SearchCareTakerSection extends Component {
   searchCaretakers = (async () => {
     const { rating, bidamount, date, serviceid } = this.state;
     try {
-      // Fetch pets for user
       const response = await axios.post('http://localhost:3030/search/', {
         post: 'searchCaretakers',
         serviceid,
