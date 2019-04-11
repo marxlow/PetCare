@@ -10,12 +10,12 @@ class CompletedServicesSection extends Component {
     super(props);
     this.state = {
       userId: this.props.userId,
-      careTakerEmail: '', // Email of care taker, user is writing review for
       reviewMessage: '',
       rating: 0,
       openModal: false,
       completed: [],
 
+      bid: 0,
       dateofservice: '',
       bidamount: 0,
       caretakername: '',
@@ -33,8 +33,8 @@ class CompletedServicesSection extends Component {
     try {
       // Fetch completed services
       const response = await axios.post('http://localhost:3030/search/', {
-        post: 'getAllCompletedServices',
-        email: userId,
+        post:           'getAllCompletedServices',
+        petownerEmail:  userId,
       });
       if (response.status === 200) {
         const completed = response.data;
@@ -47,15 +47,34 @@ class CompletedServicesSection extends Component {
   });
 
   // Called before writing a review
-  openModal(email) {
-    this.setState({ careTakerEmail: email, showModal: true });
+  openModal(email, bid) {
+    this.setState({ caretakeremail: email, bid: bid, showModal: true });
   }
 
   // Modal functions
   handleOk = (async (event) => {
-    const { reviewMessage, rating } = this.state;
-    // Make API call to write review
-    this.setState({ showModal: false, reviewMessage: '' });
+    const { reviewMessage, rating, userId, caretakeremail, bid } = this.state;
+    try {
+      // Fetch completed services
+      const response = await axios.post('http://localhost:3030/review/', {
+        post:   'createReview',
+        email:  caretakeremail,
+        bid:    bid,
+        review: reviewMessage,
+        rating: rating,
+        byUser: userId,
+      });
+
+      if (response.status === 200) {
+        const createdReview = response.data;
+        console.log('> Write Review Successful', createdReview);
+        this.setState({ showModal: false, reviewMessage: '' });
+        // Hide review button once created.
+      }
+    } catch (error) {
+      message.warn(`Error while writing review`);
+    }
+
   });
 
   handleCancel = (() => {
@@ -85,7 +104,7 @@ class CompletedServicesSection extends Component {
                   <span>{`Date: ${item.dateofservice}`}</span>
                   <span>{`Price: $${item.bidamount}`}</span>
                   <span>{`Taker: ${item.caretakername}`}</span>
-                  <Button icon="write" onClick={() => this.openModal(item.caretakeremail)}>Write Review</Button>
+                  <Button icon="write" onClick={() => this.openModal(item.caretakeremail, item.bid)}>Write Review</Button>
                 </div>
               </List.Item>
             )
