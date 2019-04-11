@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Tabs } from 'antd';
 import PetSection from './components/PetSection';
-import CareTakerSearchSection from './components/CareTakerSearchSection';
+import SearchCareTakerSection from './components/SearchCareTakerSection';
 import BidHistorySection from './components/BidHistorySection';
 
 const TabPane = Tabs.TabPane;
@@ -17,7 +17,7 @@ class PetOwnerView extends Component {
 
         {/* Searching & Bidding for care takers */}
         <TabPane tab="Search" key="2">
-          <CareTakerSearchSection />
+          <SearchCareTakerSection />
         </TabPane>
 
         {/* History of Successful bids */}

@@ -4,7 +4,7 @@ import axios from "axios";
 
 const ListItem = List.Item;
 
-class CareTakerSearchSection extends Component {
+class SearchCareTakerSection extends Component {
 
   constructor(props) {
     super(props);
@@ -141,4 +141,4 @@ class CareTakerSearchSection extends Component {
   }
 }
 
-export default CareTakerSearchSection;
+export default SearchCareTakerSection;
