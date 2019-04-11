@@ -7,20 +7,17 @@ const Option = Select.Option;
 const ListItem = List.Item;
 const ListItemMeta = ListItem.Meta;
 
-const petsStub = [{ pid: 1, name: 'Dog1', speciesname: 'Dog', breedname: 'Husky', specialNote: 'Likes to poop', diet: 'Vegetarian' },
-                  { pid: 5, name: 'Cat1', speciesname: 'Cat', breedname: 'Persian', specialNote: 'Hates Humans', diet: 'None' }];
-
 class PetSection extends Component {
   constructor(props) {
     super(props);
     this.state = {
       userId: this.props.userId,
-      pets: petsStub,
+      pets: [],
       pid: '',
       name: '',
       speciesname: '',
       breedname: '',
-      specialNote: '',
+      specialnote: '',
       diet: '',
       alert: 'invisible',
       breedsOpt: [{ breedname: 'No Species Specified' }],
@@ -46,7 +43,7 @@ class PetSection extends Component {
 
   // Changing of any notes of pet
   handleSpecialNoteChange = ((e) => {
-    this.setState({ specialNote: e.target.value })
+    this.setState({ specialnote: e.target.value })
   });
 
   // When speciesname change, e.g to "dog". We have to fetch the breeds allowed for the speciesname.
@@ -83,44 +80,41 @@ class PetSection extends Component {
     } catch (error) {
       message.warn(`Error while fetching diets and species`);
     }
+    await this.getAllPets();
+  }
+
+  getAllPets = (async () => {
+    const { userId } = this.state;
     try {
       // Fetch pets for user
-      const petResponse = await axios.post('http://localhost:3030/petsection/', { 
+      const petResponse = await axios.post('http://localhost:3030/petsection/', {
         post: 'getAllPets',
         email: userId,
       });
       if (petResponse.status === 200) {
-        const pets = petResponse.data.rows;
+        const pets = petResponse.data;
         console.log('> Loaded Pets', pets);
         this.setState({ pets });
       }
     } catch (error) {
       message.warn(`Error while fetching Pets`);
     }
-  }
+
+  });
 
   // Adding a new pet for a pet owner
   addToPets = (async (event) => {
     // Guard against missing fields.
-    const { userId, name, speciesname, breedname, diet, specialNote, pets } = this.state;
+    const { userId, name, speciesname, breedname, diet, specialnote, pets } = this.state;
     if (name === '' || speciesname === '' || breedname === '' || diet === '') {
       this.setState({ alert: 'empty' });
       return;
-    }
-    // Guard against duplicate pets. When name, speciesname & breedname already exists.
-    if (pets.length > 0) {
-      for (let i = 0; i < pets.length; i++) {
-        if (pets[i].name === name && pets[i].speciesname === speciesname && pets[i].breedname === breedname) {
-          this.setState({ alert: 'duplicate' });
-          return;
-        }
-      }
     }
     // All guards pass, proceed to add pet to DB
     const data = {
       name,
       diet,
-      specialNote,
+      specialNote: specialnote,
       post: 'addPets',
       email: userId,
       speciesName: speciesname,
@@ -129,10 +123,8 @@ class PetSection extends Component {
     try {
       const response = await axios.post('http://localhost:3030/petsection/', data);
       if (response.status === 200) {
-        const newPet = { pid: response.data, name, species: speciesname, breed: breedname, specialNote, diet };
-        const nextPets = Object.assign([], pets);
-        nextPets.push(newPet);
-        this.setState({ pets: nextPets, alert: `Success! Added ${name} as your pet` });
+        this.setState({ pets: response.data.rows, alert: `Success! Added ${name} as your pet` });
+        await this.getAllPets();
       }
     } catch (err) {
       console.error("Unable to add pet to Database for user. Error: " + err.response.data);
@@ -151,6 +143,7 @@ class PetSection extends Component {
       if (response.status === 200) {
         const pets = response.data.rows;
         this.setState({ pets, alert: `Success! Deleted pet of pid: ${pid}` });
+        await this.getAllPets();
       }
     } catch (err) {
       console.error("Unable to delete pet in Database for user. Error: " + err.response.data);
@@ -256,7 +249,7 @@ class PetSection extends Component {
 
           {/* Other notes we need to know */}
           <FormItem className="col-5 mx-2" label="Special Notes">
-            {getFieldDecorator('specialNote', { rules: [{ required: false, message: 'Any other concerns?' }] })(
+            {getFieldDecorator('specialnote', { rules: [{ required: false, message: 'Any other concerns?' }] })(
               <Input onChange={this.handleSpecialNoteChange} />
             )}
           </FormItem>
@@ -274,7 +267,7 @@ class PetSection extends Component {
               <ListItemMeta
                 avatar={<Avatar src="http://adventuretimeforum.com/jakehead.png" />}
                 title={`${item.name}, ${item.breedname}`}
-                description={`${item.diet} | ${item.specialNote}`}
+                description={`${item.diet} | ${item.specialnote}`}
               />
               <Button icon="delete" onClick={(() => this.deletePet(item.pid))}>Delete Pet</Button>
             </ListItem>
