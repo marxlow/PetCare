@@ -83,6 +83,7 @@ class PetSection extends Component {
     await this.getAllPets();
   }
 
+  // Get all pets that belong to the pet owner
   getAllPets = (async () => {
     const { userId } = this.state;
     try {
@@ -137,6 +138,7 @@ class PetSection extends Component {
     const { userId } = this.state;
     try {
       const response = await axios.post('http://localhost:3030/petsection/', {
+        post: 'deletePet',
         email: userId,
         pid,
       });
@@ -266,8 +268,8 @@ class PetSection extends Component {
             <ListItem>
               <ListItemMeta
                 avatar={<Avatar src="http://adventuretimeforum.com/jakehead.png" />}
-                title={`${item.name}, ${item.breedname}`}
-                description={`${item.diet} | ${item.specialnote}`}
+                title={`${item.name}`}
+                description={`${item.speciesname} | ${item.breedname} | ${item.diet} | ${item.specialnote}`}
               />
               <Button icon="delete" onClick={(() => this.deletePet(item.pid))}>Delete Pet</Button>
             </ListItem>
