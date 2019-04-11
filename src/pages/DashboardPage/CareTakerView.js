@@ -53,6 +53,7 @@ class CareTakerView extends Component {
       }
     } catch (err) {
       console.error("Unable to get Average Rating. Error: " + err.response.data)
+      message.warn("Unable to get Avrage Rating");
     }
   });
 
@@ -67,11 +68,12 @@ class CareTakerView extends Component {
         post: 'getAllService',
       });
       if (response.status === 200) {
-        const serviceOptions = response.data.rows;
+        const serviceOptions = response.data;
         this.setState({ serviceOptions: serviceOptions, selectedService: serviceOptions[0] });
       }
     } catch (err) {
       console.error("Unable to get Services. Error: " + err.response.data)
+      message.warn("Unable to get all Service options");
     }
   });
 
@@ -81,15 +83,16 @@ class CareTakerView extends Component {
       const response = await axios.post('http://localhost:3030/caretaker', {
         post: 'addService',
         email: userId,
-        service: selectedService,
+        services: [selectedService],
       });
       if (response.status === 200) {
-        const nextServices = response.data.rows;
+        const nextServices = response.data;
         this.setState({ services: nextServices });
         console.log("New User's services:", nextServices);
       }
     } catch (err) {
       console.error("Unable to add User's service. Error: " + err.response.data)
+      message.warn("Unable to add your service");
     }
   });
 
@@ -102,11 +105,12 @@ class CareTakerView extends Component {
         email: userId
       });
       if (response.status === 200) {
-        const services = response.data.rows;
+        const services = response.data;
         this.setState({ services: services });
       }
     } catch (err) {
       console.error("Unable to get User's services. Error: " + err.response.data)
+      message.warn("Unable to get your services");
     }
   });
 
@@ -125,12 +129,13 @@ class CareTakerView extends Component {
         service: serviceToRemove,
       });
       if (response.status === 200) {
-        const nextMyServices = response.data.rows;
+        const nextMyServices = response.data;
         this.setState({ services: nextMyServices });
         console.log("New User's services:", nextMyServices);
       }
     } catch (err) {
       console.error("Unable to remove User's service. Error: " + err.response.data)
+      message.warn("Unable to remove your services");
     }
   });
 
@@ -150,6 +155,7 @@ class CareTakerView extends Component {
       }
     } catch (err) {
       console.error("Unable to get Reviews. Error: " + err.response.data)
+      message.warn("Unable to get Reviews");
     }
   });
 
@@ -164,12 +170,13 @@ class CareTakerView extends Component {
         email: userId,
       });
       if (response.status === 200) {
-        const workDates = response.data.rows;
+        const workDates = response.data;
         this.setState({ workDates: workDates });
         console.log("getWorkDates:", workDates);
       }
     } catch (err) {
       console.error("Unable to get Work Dates. Error: " + err.response.data)
+      message.warn("Unable to get Work Dates");
     }
   });
 
@@ -189,18 +196,19 @@ class CareTakerView extends Component {
       }
     } catch (err) {
       console.error("Unable to get Bids. Error: " + err.response.data)
+      message.warn("Unable to get Bids");
     }
   });
 
   // acceptBid: accept current highest bid of a specific day
   // ( input: caretakerEmail, dateOfService output: [DateOfService, petownerEmail, price])
-  acceptBid = (async () => {
-    const { userId, bid } = this.state;
+  acceptBid = (async (bid) => {
+    const { userId } = this.state;
     try {
       const response = await axios.post('http://localhost:3030/caretaker', {
         post: 'acceptBid',
         email: userId,
-        bid: bid,
+        bid,
       });
       if (response.status === 200) {
         const workDates = response.data.bids;
@@ -208,7 +216,8 @@ class CareTakerView extends Component {
         console.log("acceptBid:", workDates);
       }
     } catch (err) {
-      console.error("Unable to get accept Bid. Error: " + err.response.data)
+      console.error("Unable to accept Bid. Error: " + err.response.data)
+      message.warn("Unable to accept Bid");
     }
   });
 
@@ -222,7 +231,7 @@ class CareTakerView extends Component {
         email: this.state.userId,
       });
       if (response.status === 200) {
-        availabilities = response.data.rows;
+        availabilities = response.data;
         console.log("getAvailabilities:", availabilities);
         if (availabilities && availabilities.length > 0) {
           // TODO Marx: transform into readable format
@@ -233,20 +242,34 @@ class CareTakerView extends Component {
       message.warn("Unable to get Availabilities.");
     }
 
-    // for (let i = 0; i < availabilities.length; i++) {
-    //   const range = availabilities[i];
-    //   const yyyymm = range.startdate.slice(0, 8);
-    //   const startDay = parseInt(range.startdate.split('-')[2]);
-    //   const endDay = parseInt(range.enddate.split('-')[2]);
+    let newAvailabilities = [];
+    for (let i = 0; i < availabilities.length; i++) {
+      const range = availabilities[i];
+      const yyyymm = range.startdate.slice(0, 8);
+      const startDay = parseInt(range.startdate.split('-')[2]);
+      const endDay = parseInt(range.enddate.split('-')[2]);
 
-    //   for (let j = startDay; j <= endDay; j++) {
-    //     if (j < 10) {
-    //       availabilitiesStub.push(`${yyyymm}0${j}`);
-    //     } else {
-    //       availabilitiesStub.push(`${yyyymm}${j}`);
-    //     }
-    //   }
-    // }
+      for (let j = startDay; j <= endDay; j++) {
+        if (j < 10) {
+          newAvailabilities.push(`${yyyymm}0${j}`);
+        } else {
+          newAvailabilities.push(`${yyyymm}${j}`);
+        }
+      }
+    }
+    // Remove Duplicates
+    newAvailabilities = newAvailabilities.filter((value, index, self) => {
+      return self.indexOf(value) === index;
+    });
+
+    // Sort in order of Dates
+    newAvailabilities.sort((a, b) => {
+      if (!a || !b) { return; }
+      // Turn your strings into dates, and then s ubtract them
+      // to get a value that is either negative, positive, or zero.
+      return new Date(a) - new Date(b);
+    });
+    this.setState({ availabilities: newAvailabilities });
   });
 
   // ( input: startdate, enddate, minAutoAcceptPrice, email output: startdate, enddate(?))
@@ -266,13 +289,14 @@ class CareTakerView extends Component {
     try {
       const response = await axios.post('http://localhost:3030/caretaker', newAvailability);
       if (response.status === 200) {
-        availabilities = response.data.rows;
-        this.setState({ availabilities });
+        availabilities = response.data;
+        // this.setState({ availabilities });
         console.log("addAvailability:", availabilities);
       }
     } catch (err) {
       console.error("Unable to set Availabilities. Error: " + err.response.data)
       message.warn("Unable to add Availabilities", newAvailability);
+      return;
     }
 
     // Transform start and end dates to be day by day
@@ -306,9 +330,7 @@ class CareTakerView extends Component {
       // to get a value that is either negative, positive, or zero.
       return new Date(a) - new Date(b);
     });
-    this.setState({
-      availabilities: newAvailabilities,
-    })
+    this.setState({ availabilities: newAvailabilities });
 
     // TODO: @chiasin. Refresh availbilities.
     // await this.getDatesForCareTaker();
@@ -317,6 +339,7 @@ class CareTakerView extends Component {
   //removeAvailabilities: remove availabilities 
   //(input: email, {date(yyyy-mm-dd format)} output: {startdate, enddate, price})
   removeAvailabilities = (async (date) => {
+    console.log("Removing date:", date);
     const { userId } = this.state;
     let availabilities = []
     try {
@@ -326,13 +349,14 @@ class CareTakerView extends Component {
         date,
       });
       if (response.status === 200) {
-        availabilities = response.data.rows;
+        availabilities = response.data;
         this.setState({ availabilities });
         console.log("removeAvailabilities:", availabilities);
       }
     } catch (err) {
       console.error("Unable to remove Availabilities. Error: " + err.response.data)
       message.warn("Unable to remove Availability", date);
+      return;
     }
 
     // Transform start and end dates to be day by day
@@ -380,8 +404,8 @@ class CareTakerView extends Component {
   });
 
   render() {
-    const { reviews, serviceOptions } = this.state;
-    const services = [{ serviceid: 'Pet Walking' }, { serviceid: 'Pet something' }]; // MOCK data. @chiasin. Since the user does not have any service.
+    const { reviews, serviceOptions, services } = this.state;
+    // const services = [{ serviceid: 'Pet Walking' }, { serviceid: 'Pet something' }]; // MOCK data. @chiasin. Since the user does not have any service.
     return (
       < Tabs type="card">
 
