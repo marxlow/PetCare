@@ -22,7 +22,7 @@ class App extends Component {
 
 
             {/* Private Pages */}
-            <PrivateRoute exact path="/" component={DashboardPage} />
+            <PrivateRoute exact path="/" component={LoginPage} />
           </Switch>
         </BrowserRouter>
       </div>
