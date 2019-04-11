@@ -3,6 +3,7 @@ import AppHeader from 'shared/layouts/AppHeader';
 import PetOwnerView from './PetOwnerView';
 import CareTakerView from './CareTakerView';
 import axios from 'axios';
+import { Divider } from 'antd';
 
 class DashboardPage extends Component {
   constructor(props) {
@@ -13,36 +14,19 @@ class DashboardPage extends Component {
       userData: {},
       userName: 'UNKNOWN',
       wallet: 0,
-      badges: { badge: '', descript: ''},
+      badges: { badge: '', descript: '' },
       avgRating: -1,
     }
   }
 
+  // Only for Care takers
   updateAvgRating = ((newRating) => {
     this.setState({ avgRating: newRating });
   });
 
-  updateWallet = (async(value) => {
-    //const valueStub = 123;
-    const { userId } = this.state;
-    try {
-      const response = await axios.post('http://localhost:3030/wallet/', {
-        post: 'updateWallet',
-        amt: value,
-        email: userId,
-      });
-      if (response.status === 200) {
-        const avgRating = response.data.avgRating;
-        this.setState({ avgRating });
-      }
-    } catch (err) {
-      console.error("Unable to get Badges. Error: " + err.response.data)
-    }
-  });
-
   // When component is loaded. Fetch Name and badges for User and avg ratings for caretaker 
   async componentDidMount() {
-    const { userId, role } = this.state;
+    const { userId } = this.state;
     // Get Username
     try {
       const response = await axios.post('http://localhost:3030/user/', {
@@ -65,7 +49,7 @@ class DashboardPage extends Component {
       if (response.status === 200) {
         const wallet = response.data.rows[0].walletamt;
         this.setState({ wallet });
-      } 
+      }
     } catch (err) {
       console.error("Unable to get wallet. Error: " + err.response.data)
     }
@@ -97,7 +81,7 @@ class DashboardPage extends Component {
 
   render() {
     const { userId, role, userName, badges, wallet, avgRating } = this.state;
-    if ( !localStorage.getItem('role') || role === null ){
+    if (!localStorage.getItem('role') || role === null) {
       localStorage.clear(); // Remove all key/value pair in localstorage
       this.props.history.push('/login');
     }
@@ -114,14 +98,12 @@ class DashboardPage extends Component {
               </div>
               <div className="d-flex flex-column align-items-center mt-4">
                 <h5>{userName}</h5>
-                <h5>{role}</h5>
-                <h5>{userId}</h5>
+                <Divider />
                 <h5>Badge: {badges.badge}</h5>
+                <Divider />
                 <h5>Wallet Amount: ${wallet}</h5>
-                {role === 'Care Taker' ? 
-                  <h5>Rating: {avgRating}</h5>
-                  : null
-                }
+                <Divider />
+                {role !== 'Pet Owner' ? <h5>Rating: {avgRating}</h5> : null}
               </div>
             </div>
             <div className="col-8">
