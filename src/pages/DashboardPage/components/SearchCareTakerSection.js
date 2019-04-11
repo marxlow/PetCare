@@ -33,7 +33,7 @@ class SearchCareTakerSection extends Component {
     const { email, rating, bidamount, date } = this.state;
     try {
       // Fetch pets for user
-      const petResponse = await axios.post('http://localhost:3030/petownersearch/', {
+      const petResponse = await axios.post('http://localhost:3030/search/', {
         post: 'getAllCaretakers',
         email,
         rating,
