@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { Tabs } from 'antd';
 import PetSection from './components/PetSection';
 import SearchCareTakerSection from './components/SearchCareTakerSection';
-import BidHistorySection from './components/BidHistorySection';
+import CompletedServicesSection from './components/CompletedServicesSection';
+import CurrentBidsSection from './components/CurrentBidsSection';
 
 const TabPane = Tabs.TabPane;
 class PetOwnerView extends Component {
@@ -20,9 +21,14 @@ class PetOwnerView extends Component {
           <SearchCareTakerSection />
         </TabPane>
 
-        {/* History of Successful bids */}
-        <TabPane tab="History" key="3">
-          <BidHistorySection userId={userId} />
+        {/* List of Completed Services */}
+        <TabPane tab="Completed Services" key="3">
+          <CompletedServicesSection userId={userId} />
+        </TabPane>
+
+        {/* List of Current Bids Pet Owner has */}
+        <TabPane tab="Current Bids" key="4">
+          <CurrentBidsSection userId={userId} />
         </TabPane>
       </Tabs>
     )
