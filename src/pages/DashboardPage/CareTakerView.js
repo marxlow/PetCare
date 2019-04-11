@@ -224,8 +224,9 @@ class CareTakerView extends Component {
         bid,
       });
       if (response.status === 200) {
-        const workDates = response.data.bids;
-        // this.setState({ workDates: workDates });
+        const workDates = response.data.workdates;
+        const availabilities = response.data.availabilities;
+        this.setState({ availabilities, workDates });
         console.log("acceptBid:", workDates);
       }
     } catch (err) {
