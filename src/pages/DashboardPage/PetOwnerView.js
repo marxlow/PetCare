@@ -18,7 +18,7 @@ class PetOwnerView extends Component {
 
         {/* Searching & Bidding for care takers */}
         <TabPane tab="Search" key="2">
-          <SearchCareTakerSection />
+          <SearchCareTakerSection userId={userId} />
         </TabPane>
 
         {/* List of Current Bids Pet Owner has */}

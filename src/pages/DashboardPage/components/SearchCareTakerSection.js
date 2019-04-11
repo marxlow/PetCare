@@ -13,7 +13,9 @@ class SearchCareTakerSection extends Component {
       rating: 5,
       bidamount: 0,
       date: '',
-      caretakers: [],
+      serviceid: 'No Service',
+      caretakers: [], //{"email":"ct2@hotmail.com","name":"Jack","bidamount":"999.00","avgrating":"1.00"}
+      serviceOptions: [],
     }
   }
 
@@ -28,6 +30,26 @@ class SearchCareTakerSection extends Component {
   updateStartDate = ((date) => {
     this.setState({ date });
   })
+
+  updateSelectedService = ((event) => {
+    this.setState({ serviceid: event.target.value });
+  });
+
+  async componentDidMount() {
+    try {
+      const response = await axios.post('http://localhost:3030/caretaker', {
+        post: 'getAllService',
+      });
+      if (response.status === 200) {
+        const serviceOptions = response.data;
+        this.setState({ serviceOptions: serviceOptions, serviceid: serviceOptions[0].serviceid });
+      }
+    } catch (err) {
+      console.error("Unable to get Services. Error: " + err.response.data)
+      message.warn("Unable to get all Service options");
+    }
+
+  }
 
   // Updates the bids for the selected caretaker
   updateConfirmBidAmt = ((value, caretakerEmail) => {
@@ -44,16 +66,17 @@ class SearchCareTakerSection extends Component {
     this.setState({ caretakers: newCaretakers });
   })
 
-  addBid = (async (caretakeremail, date, amount) => {
-    const { email } = this.state;
+  addBid = (async (caretakeremail, date, key) => {
+    const { email, caretakers } = this.state;
+    const bidamount = caretakers[key].bidamount;
     try {
       // Fetch pets for user
       const response = await axios.post('http://localhost:3030/search/', {
-        post: 'getAllCaretakers',
-        email,
-        date,
-        bidamount: amount,
-        caretakeremail
+        post: 'addBid',
+        caretakeremail,
+        petownerEmail: email,
+        dateofservice: date,
+        bidamount,
       });
       if (response.status === 200) {
         const caretakers = response.data;
@@ -65,17 +88,17 @@ class SearchCareTakerSection extends Component {
     }
   });
 
-  // Get all careTakers based on rating and date
-  getAllCareTakers = (async () => {
-    const { email, rating, bidamount, date } = this.state;
+  // search careTakers based on rating and date
+  searchCaretakers = (async () => {
+    const { rating, bidamount, date, serviceid } = this.state;
     try {
       // Fetch pets for user
       const response = await axios.post('http://localhost:3030/search/', {
-        post: 'getAllCaretakers',
-        email,
+        post: 'searchCaretakers',
+        serviceid,
         rating,
         bidamount,
-        date,
+        dateofservice: date,
       });
       if (response.status === 200) {
         const caretakers = response.data;
@@ -89,25 +112,26 @@ class SearchCareTakerSection extends Component {
   });
 
   render() {
-    const { rating, bidamount } = this.state;
+    const { email, rating, caretakers, serviceOptions } = this.state;
+    console.log("PetOwner email:", email, this.props.userId);
     const resultStub = [
       {
         name: "John Doe",
         bidamount: 5,
         rating: 4.5,
-        specialty: 'Dogs'
+        email: 'Dogs'
       },
       {
         name: "John Tan",
         bidamount: 5,
         rating: 4.5,
-        specialty: 'Dogs'
+        email: 'Dogs'
       },
       {
         name: "John Low",
         bidamount: 5,
         rating: 4.5,
-        specialty: 'Dogs'
+        email: 'Dogs'
       }
     ]
     return (
@@ -134,8 +158,14 @@ class SearchCareTakerSection extends Component {
               <DatePicker onChange={this.updateStartDate} placeHolder="Choose a date" />
             </div>
           </div>
+            <label for="inputState">Services</label>
+            <select id="inputState" className="form-control" onChange={this.updateSelectedService}>
+              {serviceOptions.map((service, key) => (
+                <option key={key} value={service.serviceid}>{service.serviceid}</option>
+              ))}
+            </select>
           <div className="d-flex justify-content-center mt-2">
-            <Button className="col-3 mt-2" type="primary" htmlType="submit" onClick={this.getAllCareTakers}>Search</Button>
+            <Button className="col-3 mt-2" type="primary" htmlType="submit" onClick={this.searchCaretakers}>Search</Button>
           </div>
         </section>
         <Divider />
@@ -146,26 +176,25 @@ class SearchCareTakerSection extends Component {
             grid={{
               gutter: 16, xs: 1, sm: 2, md: 4, lg: 4, xl: 6, xxl: 3,
             }}
-            dataSource={resultStub}
-            renderItem={item => (
+            dataSource={caretakers}
+            renderItem={(item, key) => (
               <ListItem>
                 <Card
                   hoverable={true}
                   title={item.name}
                 >
-                  Specialty: {item.specialty}<br />
-                  Rating: {item.rating}<br />
-                  Experience: {item.bidamount}<br />
+                  Email: {item.email}<br />
+                  Rating: {item.avgrating}<br />
                 </Card>
                 <InputNumber
-                  defaultValue={1000}
+                  defaultValue={item.bidamount}
                   className={"w-100"}
                   size={'large'}
                   formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                   parser={value => value.replace(/\$\s?|(,*)/g, '')}
                   onChange={(value) => this.updateConfirmBidAmt(value, item.email)}
                 />
-                <Button className={"w-100"} onClick={() => this.addBid(item.email, item.dateofservice)} >Confirm Bid</Button>
+                <Button className={"w-100"} onClick={() => this.addBid(item.email, item.dateofservice, key)} >Confirm Bid</Button>
               </ListItem>
             )}
           />
