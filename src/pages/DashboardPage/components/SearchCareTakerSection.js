@@ -13,6 +13,7 @@ class SearchCareTakerSection extends Component {
       rating: 5,
       bidamount: 0,
       date: '',
+      caretakers: [],
     }
   }
 
@@ -28,25 +29,61 @@ class SearchCareTakerSection extends Component {
     this.setState({ date });
   })
 
+  // Updates the bids for the selected caretaker
+  updateConfirmBidAmt = ((value, caretakerEmail) => {
+    console.log("updateConfirmBidAmt:", value, caretakerEmail);
+    const { caretakers } = this.state;
+    const newCaretakers = Object.assign([], caretakers);
+    for (var i=0; i<newCaretakers.length; i++){
+      if (newCaretakers[i].email === caretakerEmail){
+        newCaretakers[i].bidamount = value;
+        break;
+      }
+    }
+    console.log("newCaretakers", newCaretakers);
+    this.setState({ caretakers: newCaretakers });
+  })
+
+  addBid = (async (caretakeremail, date, amount) => {
+    const { email } = this.state;
+    try {
+      // Fetch pets for user
+      const response = await axios.post('http://localhost:3030/search/', {
+        post: 'getAllCaretakers',
+        email,
+        date,
+        bidamount: amount,
+        caretakeremail
+      });
+      if (response.status === 200) {
+        const caretakers = response.data;
+        console.log('> Loaded caretakers', caretakers);
+        this.setState({ caretakers });
+      }
+    } catch (error) {
+      message.warn(`Error Adding Bid`);
+    }
+  });
+
   // Get all careTakers based on rating and date
   getAllCareTakers = (async () => {
     const { email, rating, bidamount, date } = this.state;
     try {
       // Fetch pets for user
-      const petResponse = await axios.post('http://localhost:3030/search/', {
+      const response = await axios.post('http://localhost:3030/search/', {
         post: 'getAllCaretakers',
         email,
         rating,
-        bidamount
-
+        bidamount,
+        date,
       });
-      if (petResponse.status === 200) {
-        const pets = petResponse.data;
-        console.log('> Loaded Pets', pets);
-        this.setState({ pets });
+      if (response.status === 200) {
+        const caretakers = response.data;
+        console.log('> Loaded Caretakers', caretakers);
+        this.setState({ caretakers });
       }
     } catch (error) {
-      message.warn(`Error while fetching Pets`);
+      message.warn(`Error while Searching for Caretakers`);
     }
 
   });
@@ -126,10 +163,9 @@ class SearchCareTakerSection extends Component {
                   size={'large'}
                   formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                   parser={value => value.replace(/\$\s?|(,*)/g, '')}
-                // onChange={onChange}
+                  onChange={(value) => this.updateConfirmBidAmt(value, item.email)}
                 />
-                <Button className={"w-100"}>Confirm Bid</Button>
-
+                <Button className={"w-100"} onClick={() => this.addBid(item.email, item.dateofservice)} >Confirm Bid</Button>
               </ListItem>
             )}
           />
