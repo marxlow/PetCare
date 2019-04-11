@@ -22,7 +22,7 @@ class CareTakerView extends Component {
       serviceOptions: [], //{serviceid}
       services: [], //{serviceid}
       reviews: [],
-      workDates: [],
+      workDates: [], //{DateOfService, bidderEmail, bidAmount}
     }
   }
 
@@ -37,7 +37,7 @@ class CareTakerView extends Component {
     await this.getAllService();
     await this.getMyService();
     await this.getBids();
-    // await this.getWorkDates();
+    await this.getWorkDates();
   }
 
   // Fetch average ratings for care taker 
@@ -175,6 +175,15 @@ class CareTakerView extends Component {
       });
       if (response.status === 200) {
         const workDates = response.data;
+
+        // Sort in order of Dates
+        workDates.sort((a, b) => {
+          if (!a || !b) { return; }
+          // Turn your strings into dates, and then s ubtract them
+          // to get a value that is either negative, positive, or zero.
+          return new Date(a.dateofservice) - new Date(b.dateofservice);
+        });
+
         this.setState({ workDates: workDates });
         console.log("getWorkDates:", workDates);
       }
@@ -487,8 +496,8 @@ class CareTakerView extends Component {
                   <List.Item>
                     <div className="w-100">
                       <ListItemMeta
-                        title={`${review.name}`}
-                        description={`${review.descript} | Rating:${review.rating} | Date of Service:${review.dateOfService} | Accepted Amount: ${review.price} | ${review.rid}`}
+                        title={`${review.name} | ${review.email}`}
+                        description={`${review.review} | Rating:${review.rating} | Date of Service:${review.dateofservice} | Accepted Amount: ${review.bidamount} | ${review.rid} | ${review.timestamp}`}
                       />
                     </div>
                   </List.Item>
@@ -509,8 +518,8 @@ class CareTakerView extends Component {
                   <List.Item>
                     <div className="w-100">
                       <ListItemMeta
-                          title={`${item.date}`}
-                          description={`Pet Owner:${item.email} | Accepted Amount:${item.price} | ${item.bid}`}
+                          title={`${item.dateofservice}`}
+                          description={`Pet Owner:${item.bidderemail} | Accepted Amount:${item.bidamount} | ${item.bid}`}
                         />
                     </div>
                   </List.Item>

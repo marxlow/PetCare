@@ -15,7 +15,7 @@ class DashboardPage extends Component {
       userName: 'UNKNOWN',
       wallet: 0,
       badges: { badge: '', descript: '' },
-      avgRating: -1,
+      avgRating: 'No Ratings',
     }
   }
 
