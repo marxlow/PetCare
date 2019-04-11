@@ -154,18 +154,20 @@ class SearchCareTakerSection extends Component {
                 onChange={this.updateBidAmount}
             />
           </div>
-          <div className="col-5 d-flex flex-column mt-3">
+          <div className="col-5 d-flex flex-column mt-2">
             <span>Start Date</span>
             <div>
               <DatePicker onChange={this.updateStartDate} placeHolder="Choose a date" />
             </div>
           </div>
-            <label for="inputState">Services</label>
+          <div className="col-5 d-flex flex-column mt-2">
+            <span>Services</span>
             <select id="inputState" className="form-control" onChange={this.updateSelectedService}>
               {serviceOptions.map((service, key) => (
-                <option key={key} value={service.serviceid}>{service.serviceid}</option>
+                  <option key={key} value={service.serviceid}>{service.serviceid}</option>
               ))}
             </select>
+          </div>
           <div className="d-flex justify-content-center mt-2">
             <Button className="col-3 mt-2" type="primary" htmlType="submit" onClick={this.searchCaretakers}>Search</Button>
           </div>
