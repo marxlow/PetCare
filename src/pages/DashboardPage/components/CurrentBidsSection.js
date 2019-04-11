@@ -4,6 +4,11 @@ import axios from 'axios';
 
 const { Paragraph } = Typography;
 
+const bidsStub = [
+  {caretakeremail: 'bob@gmail.com', highestbidderemail: 'greg@gmail.com', currenttopbidamt: 150 , dateofservice: '2019-01-15' , bidtimestamp: '2019-01-15' },
+  {caretakeremail: 'bod@gmail.com', highestbidderemail: 'gre@gmail.com', currenttopbidamt: 150 , dateofservice: '2019-01-15' , bidtimestamp: '2019-01-15' },
+]
+
 class CurrentBidsSection extends Component {
 
   constructor(props) {
@@ -11,7 +16,7 @@ class CurrentBidsSection extends Component {
     this.state = {
       userId: this.props.userId,
       selectedBid: '',
-      bids: [],
+      bids: bidsStub, // {caretakeremail, highestBidderEmail, currentTopbidamt , dateofservice, bidtimestamp },
       openModal: false,
       newamount: 0,
     };
@@ -82,11 +87,7 @@ class CurrentBidsSection extends Component {
     this.setState({ newamount: value });
   });
   render() {
-    const bids = [
-      { price: 100, date: '2019-01-15', careTaker: 'bob', careTakerEmail: 'bob@gmail.com' },
-      { price: 100, date: '2019-01-13', careTaker: 'Greg', careTakerEmail: 'greg@gmail.com' },
-    ]
-    const { showModal, reviewMessage, careTakerEmail } = this.state;
+    const { showModal, selectedBid, bids } = this.state;
 
     return (
       <div className="w-100">
@@ -97,7 +98,7 @@ class CurrentBidsSection extends Component {
             return (
               <List.Item>
                 <div className="d-flex w-100 justify-content-between">
-                  <span>{`Date: ${item.date} | Price: ${item.price} | Taker: ${item.careTaker}`}</span>
+                  <span>{`Date: ${item.dateofservice} | Top Bid: ${item.currenttopbidamt} | Taker: ${item.highestbidderemail} | Timestamp: ${item.bidtimestamp}`}</span>
                   <Button icon="submit" onClick={() => this.openModal(item)}>Update Bid</Button>
                 </div>
               </List.Item>
@@ -105,7 +106,7 @@ class CurrentBidsSection extends Component {
           })}
         />
         <Modal
-          title={`Care-taker Review: ${careTakerEmail}`}
+          title={`Bid: ${selectedBid.currenttopbidamt}`}
           visible={showModal}
           onOk={this.updateBid}
           onCancel={this.handleCancel}
