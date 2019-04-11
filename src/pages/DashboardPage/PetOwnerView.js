@@ -21,14 +21,14 @@ class PetOwnerView extends Component {
           <SearchCareTakerSection />
         </TabPane>
 
-        {/* List of Completed Services */}
-        <TabPane tab="Completed Services" key="3">
-          <CompletedServicesSection userId={userId} />
+        {/* List of Current Bids Pet Owner has */}
+        <TabPane tab="Current Bids" key="3">
+          <CurrentBidsSection userId={userId} />
         </TabPane>
 
-        {/* List of Current Bids Pet Owner has */}
-        <TabPane tab="Current Bids" key="4">
-          <CurrentBidsSection userId={userId} />
+        {/* List of Completed Services */}
+        <TabPane tab="Completed Services" key="4">
+            <CompletedServicesSection userId={userId} />
         </TabPane>
       </Tabs>
     )

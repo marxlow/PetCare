@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { List, Button, Modal, Typography, Rate, Icon } from 'antd';
+import {List, Button, Modal, Typography, Rate, Icon, message} from 'antd';
 import axios from 'axios';
 
 const { Paragraph } = Typography;
@@ -15,15 +15,36 @@ class CompletedServicesSection extends Component {
       rating: 0,
       openModal: false,
       completed: [],
+
+      dateofservice: '',
+      bidamount: 0,
+      caretakername: '',
+      caretakeremail: '',
     };
   }
 
   // When component first loads, find all bids belonging to current user
   async componentDidMount() {
-    const { userId } = this.state;
-    // Axios.get('');
-    // this.setState({ completed });
+      this.getAllCompletedServices();
   }
+
+  getAllCompletedServices = (async () => {
+    const { userId } = this.state;
+    try {
+      // Fetch completed services
+      const response = await axios.post('http://localhost:3030/search/', {
+        post: 'getAllCompletedServices',
+        email: userId,
+      });
+      if (response.status === 200) {
+        const completed = response.data;
+        console.log('> Loaded Completed Services', completed);
+        this.setState({ completed });
+      }
+    } catch (error) {
+      message.warn(`Error while fetching Completed Services`);
+    }
+  });
 
   // Called before writing a review
   openModal(email) {
@@ -50,11 +71,7 @@ class CompletedServicesSection extends Component {
   });
 
   render() {
-    const completed = [
-      { price: 100, date: '2019-01-15', careTaker: 'bob', careTakerEmail: 'bob@gmail.com' },
-      { price: 100, date: '2019-01-13', careTaker: 'Greg', careTakerEmail: 'greg@gmail.com' },
-    ]
-    const { showModal, reviewMessage, careTakerEmail } = this.state;
+    const { showModal, reviewMessage, caretakeremail, completed } = this.state;
 
     return (
       <div className="w-100">
@@ -65,15 +82,17 @@ class CompletedServicesSection extends Component {
             return (
               <List.Item>
                 <div className="d-flex w-100 justify-content-between">
-                  <span>{`Date: ${item.date} | Price: ${item.price} | Taker: ${item.careTaker}`}</span>
-                  <Button icon="write" onClick={() => this.openModal(item.careTakerEmail)}>Write Review</Button>
+                  <span>{`Date: ${item.dateofservice}`}</span>
+                  <span>{`Price: $${item.bidamount}`}</span>
+                  <span>{`Taker: ${item.caretakername}`}</span>
+                  <Button icon="write" onClick={() => this.openModal(item.caretakeremail)}>Write Review</Button>
                 </div>
               </List.Item>
             )
           })}
         />
         <Modal
-          title={`Care-taker Review: ${careTakerEmail}`}
+          title={`Care-taker Review: ${caretakeremail}`}
           visible={showModal}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
