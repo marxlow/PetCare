@@ -14,13 +14,15 @@ class CareTakerView extends Component {
     this.state = {
       userId: localStorage.getItem('userId'),
       availabilities: [],
+      bids: [], //{"bid":1,"dateofservice":"2018-12-31T16:00:00.000Z","bidderemail":"po@hotmail.com","bidamount":100}
       startDate: '',
       endDate: '',
       autoAcceptedPrice: 1000,
       selectedService: '',
-      serviceOptions: [],
-      services: [],
+      serviceOptions: [], //{serviceid}
+      services: [], //{serviceid}
       reviews: [],
+      workDates: [],
     }
   }
 
@@ -34,6 +36,7 @@ class CareTakerView extends Component {
     await this.getAvgRating();
     await this.getAllService();
     await this.getMyService();
+    await this.getBids();
     // await this.getWorkDates();
   }
 
@@ -150,7 +153,7 @@ class CareTakerView extends Component {
         email: userId,
       });
       if (response.status === 200) {
-        const reviews = response.data.reviews;
+        const reviews = response.data;
         this.setState({ reviews: reviews });
         console.log("getWorkDates:", reviews);
       }
@@ -191,7 +194,7 @@ class CareTakerView extends Component {
         email: userId,
       });
       if (response.status === 200) {
-        const bids = response.data.bids;
+        const bids = response.data;
         this.setState({ bids: bids });
         console.log("getBids:", bids);
       }
@@ -202,7 +205,7 @@ class CareTakerView extends Component {
   });
 
   // acceptBid: accept current highest bid of a specific day
-  // ( input: caretakerEmail, dateOfService output: [DateOfService, petownerEmail, price])
+  // ( input: caretakerEmail, bid output: [DateOfService, petownerEmail, price])
   acceptBid = (async (bid) => {
     const { userId } = this.state;
     try {
@@ -213,13 +216,14 @@ class CareTakerView extends Component {
       });
       if (response.status === 200) {
         const workDates = response.data.bids;
-        this.setState({ workDates: workDates });
+        // this.setState({ workDates: workDates });
         console.log("acceptBid:", workDates);
       }
     } catch (err) {
       console.error("Unable to accept Bid. Error: " + err.response.data)
       message.warn("Unable to accept Bid");
     }
+    await this.getBids();
   });
 
   // Make API call to fetch dates
@@ -405,8 +409,8 @@ class CareTakerView extends Component {
   });
 
   render() {
-    const { reviews, serviceOptions, services } = this.state;
-    // const services = [{ serviceid: 'Pet Walking' }, { serviceid: 'Pet something' }]; // MOCK data. @chiasin. Since the user does not have any service.
+    const { reviews, serviceOptions, services, workDates, bids } = this.state;
+    console.log("Bids:", JSON.stringify(bids));
     return (
       < Tabs type="card">
 
@@ -456,6 +460,7 @@ class CareTakerView extends Component {
             <div className="col-6">
               <h3>List of Services</h3>
               <List
+                bordered
                 dataSource={services}
                 renderItem={(service, key) => (
                   <List.Item>
@@ -470,22 +475,69 @@ class CareTakerView extends Component {
           </div>
         </TabPane>
 
-        {/* Reviews of care taker */}
-        <TabPane tab="Your Reviews" key="3">
+        {/* Work Hx and Reviews of care taker */}
+        <TabPane tab="Your Past Work" key="3">
           <div className="w-100 d-flex">
             <List
               bordered
+              itemLayout="horizontal"
               dataSource={reviews}
               renderItem={((review) => {
                 return (
                   <List.Item>
                     <div className="w-100">
-                      <span>{review}</span>
+                      <ListItemMeta
+                        title={`${review.name}`}
+                        description={`${review.descript} | Rating:${review.rating} | Date of Service:${review.dateOfService} | Accepted Amount: ${review.price} | ${review.rid}`}
+                      />
                     </div>
                   </List.Item>
                 )
               })}
             />
+          </div>
+        </TabPane>
+
+         {/* Work to be done by care taker */}
+         <TabPane tab="Your Work Dates" key="4">
+          <div className="w-100 d-flex">
+            <List
+              bordered
+              dataSource={workDates}
+              renderItem={((item) => {
+                return (
+                  <List.Item>
+                    <div className="w-100">
+                      <ListItemMeta
+                          title={`${item.date}`}
+                          description={`Pet Owner:${item.email} | Accepted Amount:${item.price} | ${item.bid}`}
+                        />
+                    </div>
+                  </List.Item>
+                )
+              })}
+            />
+          </div>
+        </TabPane>
+
+        {/* Bids */}
+        <TabPane tab="Your Bids" key="5">
+          <div className="w-100 d-flex">
+            <section className="col-6">
+              <h3>List of Bids</h3>
+              <List
+                dataSource={bids}
+                renderItem={(item) => (
+                  <List.Item>
+                    <ListItemMeta 
+                      title={item.dateofservice}
+                      description={`Amount:$${item.bidamount} | ${item.bidderemail}`}
+                    />
+                    <Button icon="submit" onClick={(() => this.acceptBid(item.bid))}>Accept</Button>
+                  </List.Item>
+                )}
+              />
+            </section>
           </div>
         </TabPane>
       </Tabs>
