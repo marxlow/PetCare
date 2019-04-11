@@ -69,7 +69,7 @@ class CareTakerView extends Component {
       });
       if (response.status === 200) {
         const serviceOptions = response.data;
-        this.setState({ serviceOptions: serviceOptions, selectedService: serviceOptions[0] });
+        this.setState({ serviceOptions: serviceOptions, selectedService: serviceOptions[0].serviceid });
       }
     } catch (err) {
       console.error("Unable to get Services. Error: " + err.response.data)
@@ -79,6 +79,7 @@ class CareTakerView extends Component {
 
   addService = (async () => {
     const { userId, selectedService } = this.state;
+    console.log("addingService:", selectedService);
     try {
       const response = await axios.post('http://localhost:3030/caretaker', {
         post: 'addService',
