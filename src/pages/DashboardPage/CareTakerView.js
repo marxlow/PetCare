@@ -126,7 +126,7 @@ class CareTakerView extends Component {
       const response = await axios.post('http://localhost:3030/caretaker', {
         post: 'removeService',
         email: userId,
-        service: serviceToRemove,
+        services: [serviceToRemove],
       });
       if (response.status === 200) {
         const nextMyServices = response.data;
