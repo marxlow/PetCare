@@ -14,6 +14,7 @@ class CurrentBidsSection extends Component {
       bids: [],
       openModal: false,
       newamount: 0,
+      highestamount: 0
     };
   }
 
@@ -33,11 +34,11 @@ class CurrentBidsSection extends Component {
     try {
       const response = await axios.post('http://localhost:3030/search', {
         post: 'getCurrentBids',
-        email: userId,
+        petownerEmail: userId,
       });
       if (response.status === 200) {
         const bids = response.data;
-        this.setState({ bids: bids });
+        this.setState({ bids: bids, highestamount: bids.highestamount });
         console.log("getCurrentBids:", bids);
       }
     } catch (err) {
@@ -48,7 +49,7 @@ class CurrentBidsSection extends Component {
 
   // Called before updating bid
   openModal(bidObj) {
-    this.setState({ selectedBid: bidObj, showModal: true });
+    this.setState({ highestamount: bidObj.highestamount, selectedBid: bidObj, showModal: true });
   }
 
   // Add bids and return the updated bids the current pet owners has which are not accepted or outbidded
@@ -82,11 +83,7 @@ class CurrentBidsSection extends Component {
     this.setState({ newamount: value });
   });
   render() {
-    const bids = [
-      { price: 100, date: '2019-01-15', careTaker: 'bob', careTakerEmail: 'bob@gmail.com' },
-      { price: 100, date: '2019-01-13', careTaker: 'Greg', careTakerEmail: 'greg@gmail.com' },
-    ]
-    const { showModal, reviewMessage, careTakerEmail } = this.state;
+    const { showModal, reviewMessage, careTakerEmail, bids, highestamount } = this.state;
 
     return (
       <div className="w-100">
@@ -97,7 +94,10 @@ class CurrentBidsSection extends Component {
             return (
               <List.Item>
                 <div className="d-flex w-100 justify-content-between">
-                  <span>{`Date: ${item.date} | Price: ${item.price} | Taker: ${item.careTaker}`}</span>
+                  <span>{`Date: ${item.dateofservice}`}</span>
+                  <span>{`My Bid Amt: $${item.bidamount}`}</span>
+                  <span>{`Taker: ${item.name}`}</span>
+                  <span>{`Taker Amt: $${item.highestamount}`}</span>
                   <Button icon="submit" onClick={() => this.openModal(item)}>Update Bid</Button>
                 </div>
               </List.Item>
@@ -105,7 +105,7 @@ class CurrentBidsSection extends Component {
           })}
         />
         <Modal
-          title={`Care-taker Review: ${careTakerEmail}`}
+          title={`Update Bid: (Current Highest Bid Amount: $${highestamount})`}
           visible={showModal}
           onOk={this.updateBid}
           onCancel={this.handleCancel}
