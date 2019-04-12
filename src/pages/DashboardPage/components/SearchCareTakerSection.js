@@ -28,6 +28,7 @@ class SearchCareTakerSection extends Component {
   })
 
   updateStartDate = ((date) => {
+    console.log("Start date selected:", date);
     this.setState({ date });
   })
 
@@ -100,10 +101,8 @@ class SearchCareTakerSection extends Component {
         rating,
         bidamount,
         dateofservice: date,
+        serviceid,
       };
-      if (serviceid !== 'Any') {
-        data['serviceid'] = serviceid;
-      }
       const response = await axios.post('http://localhost:3030/search/', data);
       if (response.status === 200) {
         const caretakers = response.data;
