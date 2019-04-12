@@ -87,6 +87,7 @@ class SearchCareTakerSection extends Component {
     } catch (error) {
       message.warn(`Error Adding Bid`);
     }
+    await this.props.updateWallet();
   });
 
   // search careTakers based on rating and date

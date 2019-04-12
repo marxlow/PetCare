@@ -19,12 +19,12 @@ class PetOwnerView extends Component {
 
         {/* Searching & Bidding for care takers */}
         <TabPane tab="Search" key="2">
-          <SearchCareTakerSection userId={userId} />
+          <SearchCareTakerSection userId={userId} updateWallet={this.props.updateWallet} />
         </TabPane>
 
         {/* List of Current Bids Pet Owner has */}
         <TabPane tab="Current Bids" key="3">
-          <CurrentBidsSection userId={userId} />
+          <CurrentBidsSection userId={userId} updateWallet={this.props.updateWallet} />
         </TabPane>
 
         {/* List of Completed Services */}

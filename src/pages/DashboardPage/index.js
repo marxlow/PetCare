@@ -19,6 +19,24 @@ class DashboardPage extends Component {
     }
   }
 
+  // Get and update wallet amount of users
+  getWallet = (async () => {
+    const { userId } = this.state;
+    // Get Wallet
+    try {
+      const response = await axios.post('http://localhost:3030/wallet/', {
+        post: 'getWallet',
+        email: userId,
+      });
+      if (response.status === 200) {
+        const wallet = response.data.rows[0].walletamt;
+        this.setState({ wallet });
+      }
+    } catch (err) {
+      console.error("Unable to get wallet. Error: " + err.response.data)
+    }
+  });
+
   // Only for Care takers
   updateAvgRating = ((newRating) => {
     this.setState({ avgRating: newRating });
@@ -40,19 +58,7 @@ class DashboardPage extends Component {
     } catch (err) {
       console.error("Unable to get user name. Error: " + err.response.data)
     }
-    // Get Wallet
-    try {
-      const response = await axios.post('http://localhost:3030/wallet/', {
-        post: 'getWallet',
-        email: userId,
-      });
-      if (response.status === 200) {
-        const wallet = response.data.rows[0].walletamt;
-        this.setState({ wallet });
-      }
-    } catch (err) {
-      console.error("Unable to get wallet. Error: " + err.response.data)
-    }
+    await this.getWallet();
     // Get Badges
     try {
       const response = await axios.post('http://localhost:3030/user/', {
@@ -106,9 +112,9 @@ class DashboardPage extends Component {
             </div>
             <div className="col-8">
               {role === 'Pet Owner' ?
-                <PetOwnerView userId={userId} walletAmt={wallet} />
+                <PetOwnerView userId={userId} walletAmt={wallet} updateWallet={this.getWallet} />
                 :
-                <CareTakerView userId={userId} walletAmt={wallet} updateAvgRating={this.updateAvgRating} />
+                <CareTakerView userId={userId} walletAmt={wallet} updateAvgRating={this.updateAvgRating} updateWallet={this.getWallet} />
               }
             </div>
           </div>

@@ -71,6 +71,7 @@ class CurrentBidsSection extends Component {
       message.warn("Unable to Bid");
     }
     await this.getCurrentBids();
+    this.props.updateWallet();
   });
 
   handleCancel = (() => {
