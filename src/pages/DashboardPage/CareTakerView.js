@@ -199,7 +199,14 @@ class CareTakerView extends Component {
         email: userId,
       });
       if (response.status === 200) {
-        const bids = response.data;
+        let bids = response.data;
+        bids = bids.filter((bid) => {
+          if (Number(bid.bidamount) > 0) {
+            return true;
+          } else {
+            return false;
+          }
+        })
         this.setState({ bids: bids });
         console.log("getBids:", bids);
       }
@@ -409,10 +416,11 @@ class CareTakerView extends Component {
                   <List.Item>
                     <div className="w-100">
                       <ListItemMeta
-                        title={`From ${review.byuser}`}
+                        title={`From ${review.bidderemail}`}
                       />
                       <div className="d-flex flex-column">
-                        <Rate value={review.rating} />
+                        <Rate disabled value={review.rating} />
+                        <span className="mt-2">{review.dateofservice}</span>
                         <span className="mt-2">{review.review}</span>
                       </div>
                     </div>
