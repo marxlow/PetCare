@@ -3,7 +3,7 @@ import AppHeader from 'shared/layouts/AppHeader';
 import PetOwnerView from './PetOwnerView';
 import CareTakerView from './CareTakerView';
 import axios from 'axios';
-import { Divider } from 'antd';
+import { Divider, message } from 'antd';
 
 class DashboardPage extends Component {
   constructor(props) {
@@ -29,7 +29,7 @@ class DashboardPage extends Component {
         email: userId,
       });
       if (response.status === 200) {
-        const wallet = response.data.rows[0].walletamt;
+        const wallet = Number(response.data.rows[0].walletamt);
         this.setState({ wallet });
       }
     } catch (err) {
@@ -37,6 +37,54 @@ class DashboardPage extends Component {
     }
   });
 
+  withdrawFromWallet = (async (amountToChange) => {
+    const { userId } = this.state;
+    const walletAmt = this.state.wallet;
+    const updatedWalletAmt = walletAmt - amountToChange;
+    // Guard against withdrawal amounts greater than wallet amount.
+    if (updatedWalletAmt < 0) {
+      message.warn(`You only have: $${walletAmt} in your wallet!`);
+      return;
+    }
+    // Make actual withdrawal
+    try {
+      const response = await axios.post('http://localhost:3030/wallet', {
+        email: userId,
+        amt: updatedWalletAmt,
+        post: 'updateWallet',
+      });
+      if (response.status === 200) {
+        message.success(`Successfully withdrawn $${amountToChange} from wallet`);
+        this.setState({ wallet: updatedWalletAmt });
+      }
+    } catch (error) {
+      console.warn(error.message);
+      message.warn('Error. Please try again later');
+    }
+  });
+
+  depositToWallet = (async (amountToChange) => {
+    const { userId } = this.state;
+    const walletAmt = this.state.wallet;
+    const updatedWalletAmt = walletAmt + amountToChange;
+    // Make actual withdrawal
+    try {
+      const response = await axios.post('http://localhost:3030/wallet', {
+        email: userId,
+        amt: updatedWalletAmt,
+        post: 'updateWallet',
+      });
+      console.log(response);
+      if (response.status === 200) {
+        message.success("Successfully deposited to wallet");
+        this.setState({ wallet: updatedWalletAmt });
+      }
+    } catch (error) {
+      console.warn(error.message);
+      message.warn('Error. Please try again later');
+    }
+  });
+  
   // Only for Care takers
   updateAvgRating = ((newRating) => {
     this.setState({ avgRating: newRating });
@@ -112,9 +160,9 @@ class DashboardPage extends Component {
             </div>
             <div className="col-8">
               {role === 'Pet Owner' ?
-                <PetOwnerView userId={userId} walletAmt={wallet} updateWallet={this.getWallet} />
+                <PetOwnerView userId={userId} walletAmt={wallet} updateWallet={this.getWallet} depositToWallet={this.depositToWallet} withdrawFromWallet={this.withdrawFromWallet} />
                 :
-                <CareTakerView userId={userId} walletAmt={wallet} updateAvgRating={this.updateAvgRating} updateWallet={this.getWallet} />
+                <CareTakerView userId={userId} walletAmt={wallet} updateAvgRating={this.updateAvgRating} updateWallet={this.getWallet} withdrawFromWallet={this.withdrawFromWallet} />
               }
             </div>
           </div>

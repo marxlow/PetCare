@@ -9,7 +9,7 @@ import WalletSection from './components/WalletSection';
 const TabPane = Tabs.TabPane;
 class PetOwnerView extends Component {
   render() {
-    const { userId, walletAmt } = this.props;
+    const { userId, walletAmt, withdrawFromWallet, depositToWallet, updateWallet } = this.props;
     return (
       < Tabs type="card">
         {/* Setting pet information */}
@@ -19,12 +19,12 @@ class PetOwnerView extends Component {
 
         {/* Searching & Bidding for care takers */}
         <TabPane tab="Search" key="2">
-          <SearchCareTakerSection userId={userId} updateWallet={this.props.updateWallet} />
+          <SearchCareTakerSection userId={userId} updateWallet={updateWallet} />
         </TabPane>
 
         {/* List of Current Bids Pet Owner has */}
         <TabPane tab="Current Bids" key="3">
-          <CurrentBidsSection userId={userId} updateWallet={this.props.updateWallet} />
+          <CurrentBidsSection userId={userId} updateWallet={updateWallet} walletAmt={walletAmt} withdrawFromWallet={withdrawFromWallet}/>
         </TabPane>
 
         {/* List of Completed Services */}
@@ -34,7 +34,7 @@ class PetOwnerView extends Component {
 
         {/* Wallet of user. Can Deposit or Withdraw */}
         <TabPane tab="Wallet" key="5">
-          <WalletSection userId={userId} walletAmt={walletAmt} hasDeposit={true} />
+          <WalletSection userId={userId} walletAmt={walletAmt} withdrawFromWallet={withdrawFromWallet} depositToWallet={depositToWallet} hasDeposit={true} />
         </TabPane>
       </Tabs>
     )

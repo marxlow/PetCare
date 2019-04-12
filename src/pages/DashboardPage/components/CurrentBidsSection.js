@@ -23,6 +23,7 @@ class CurrentBidsSection extends Component {
     await this.getCurrentBids();
     await this.getFutureCompletedServices();
   }
+
   // Get bids that are won by the pet owner and are in the future
   getFutureCompletedServices = (async () => {
     const { userId } = this.state;
@@ -67,18 +68,18 @@ class CurrentBidsSection extends Component {
 
   // Add bids and return the updated bids the current pet owners has which are not accepted or outbidded
   updateBid = (async () => {
-    const { userId, selectedBid, newAmount } = this.state;
-    const { caretakeremail, dateofservice } = selectedBid;
+    const { selectedBid, newAmount } = this.state;
+    const { bid, bidamount } = selectedBid;
+    const { withdrawFromWallet, walletAmt } = this.props;
     try {
       const response = await axios.post('http://localhost:3030/search', {
-        post: 'addBid',
+        post: 'updateBid',
         bidamount: newAmount,
-        caretakeremail,
-        petownerEmail: userId,
-        dateofservice,
+        bid,
       });
       if (response.status === 200) {
         message.success("Bidding Successful");
+        withdrawFromWallet(newAmount - bidamount);
       }
     } catch (err) {
       console.error("Unable to Bid. Error: " + err.response.data)
