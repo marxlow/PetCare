@@ -7,13 +7,13 @@ class WalletSection extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      walletAmt: Number(this.props.walletAmt),
+      walletAmt: 0,
       userId: this.props.userId,
       amountToChange: 0, // Only positive integers
     }
   }
 
-  async componentDidUpdate() {
+  async componentDidMount() {
     const { userId } = this.state;
     // Get Wallet
     try {
@@ -31,6 +31,10 @@ class WalletSection extends Component {
   }
 
   updateAmountToChange = ((value) => {
+    if (value < 0) {
+      message.warn('Cannot go below 0');
+      return;
+    }
     this.setState({ amountToChange: value });
   });
 
