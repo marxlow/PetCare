@@ -28,7 +28,7 @@ class SearchCareTakerSection extends Component {
   })
 
   updateStartDate = ((date) => {
-    console.log("Start date selected:", date);
+    console.log("Start date selected:", date.format("YYYY-MM-DD"));
     this.setState({ date });
   })
 
