@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import AppHeader from 'shared/layouts/AppHeader';
 import PetOwnerView from './PetOwnerView';
 import CareTakerView from './CareTakerView';
+import AdminView from './AdminView';
 import axios from 'axios';
 import { Divider, message } from 'antd';
 
@@ -159,10 +160,14 @@ class DashboardPage extends Component {
               </div>
             </div>
             <div className="col-8">
-              {role === 'Pet Owner' ?
+              {role === 'Pet Owner' && userId !== 'admin@gmail.com' ?
                 <PetOwnerView userId={userId} walletAmt={wallet} updateWallet={this.getWallet} depositToWallet={this.depositToWallet} withdrawFromWallet={this.withdrawFromWallet} />
-                :
+                : null
+              }
+              {role === 'Care Taker' ?
                 <CareTakerView userId={userId} walletAmt={wallet} updateAvgRating={this.updateAvgRating} updateWallet={this.getWallet} withdrawFromWallet={this.withdrawFromWallet} />
+                :
+                <AdminView userId={userId} />
               }
             </div>
           </div>

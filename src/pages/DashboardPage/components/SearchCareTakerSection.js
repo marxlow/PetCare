@@ -116,7 +116,7 @@ class SearchCareTakerSection extends Component {
   });
 
   render() {
-    const { email, rating, caretakers, serviceOptions } = this.state;
+    const { rating, caretakers, serviceOptions } = this.state;
     return (
       <div className="d-flex flex-column">
 
