@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Button, List, Tabs, message, InputNumber } from 'antd';
 import axios from 'axios';
 import DateSection from './components/DateSection';
-import { relativeTimeRounding } from 'moment';
+import WalletSection from './components/WalletSection';
 
 const TabPane = Tabs.TabPane;
 const ListItem = List.Item;
@@ -12,7 +12,7 @@ class CareTakerView extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      userId: localStorage.getItem('userId'),
+      userId: this.props.userId,
       availabilities: [],
       bids: [], //{"bid":1,"dateofservice":"2018-12-31T16:00:00.000Z","bidderemail":"po@hotmail.com","bidamount":100}
       startDate: '',
@@ -122,7 +122,7 @@ class CareTakerView extends Component {
   // key is the index of the service to remove in "this.state.services"
   removeService = (async (key) => {
     const { userId, services } = this.state;
-    if (services.length  === 0) {
+    if (services.length === 0) {
       return;
     }
     const serviceToRemove = services[key].serviceid;
@@ -508,8 +508,8 @@ class CareTakerView extends Component {
           </div>
         </TabPane>
 
-         {/* Work to be done by care taker */}
-         <TabPane tab="Your Work Dates" key="4">
+        {/* Work to be done by care taker */}
+        <TabPane tab="Your Work Dates" key="4">
           <div className="w-100 d-flex">
             <List
               bordered
@@ -519,9 +519,9 @@ class CareTakerView extends Component {
                   <List.Item>
                     <div className="w-100">
                       <ListItemMeta
-                          title={`${item.dateofservice}`}
-                          description={`Pet Owner:${item.bidderemail} | Accepted Amount:${item.bidamount} | ${item.bid}`}
-                        />
+                        title={`${item.dateofservice}`}
+                        description={`Pet Owner:${item.bidderemail} | Accepted Amount:${item.bidamount} | ${item.bid}`}
+                      />
                     </div>
                   </List.Item>
                 )
@@ -539,7 +539,7 @@ class CareTakerView extends Component {
                 dataSource={bids}
                 renderItem={(item) => (
                   <List.Item>
-                    <ListItemMeta 
+                    <ListItemMeta
                       title={item.dateofservice}
                       description={`Amount:$${item.bidamount} | ${item.bidderemail}`}
                     />
@@ -549,6 +549,11 @@ class CareTakerView extends Component {
               />
             </section>
           </div>
+        </TabPane>
+
+        {/* Care taker's Wallet only have withdraw functionalities. */}
+        <TabPane tab="Wallet" key="6">
+          <WalletSection userId={this.state.userId} walletAmt={this.props.walletAmt} hasDeposit={false} />
         </TabPane>
       </Tabs>
     )

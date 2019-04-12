@@ -101,16 +101,14 @@ class DashboardPage extends Component {
                 <Divider />
                 <h5>Badge: {badges.badge}</h5>
                 <Divider />
-                <h5>Wallet Amount: ${wallet}</h5>
-                <Divider />
                 {role !== 'Pet Owner' ? <h5>Rating: {avgRating}</h5> : null}
               </div>
             </div>
             <div className="col-8">
               {role === 'Pet Owner' ?
-                <PetOwnerView userId={userId} />
+                <PetOwnerView userId={userId} walletAmt={wallet} />
                 :
-                <CareTakerView userId={userId} updateAvgRating={this.updateAvgRating} />
+                <CareTakerView userId={userId} walletAmt={wallet} updateAvgRating={this.updateAvgRating} />
               }
             </div>
           </div>
