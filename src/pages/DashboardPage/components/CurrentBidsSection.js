@@ -9,21 +9,24 @@ class CurrentBidsSection extends Component {
     this.state = {
       userId: this.props.userId,
       selectedBid: '',
-      bids: [], // {caretakeremail, highestBidderEmail, currentTopbidamt , dateofservice, bidtimestamp },
       confirmedBids: [],
       openModal: false,
       newAmount: 0,
-      highestamount: 0,
-      bid: 0
+      bids: this.props.bids,
+      highestamount: this.props.highestamount,
+      bid: this.props.bid,
     };
   }
 
   // When component first loads, find all bids belonging to current user
   async componentDidMount() {
-    await this.getCurrentBids();
     await this.getFutureCompletedServices();
   }
 
+  UNSAFE_componentWillReceiveProps() {
+    this.forceUpdate();
+  }
+  
   // Get bids that are won by the pet owner and are in the future
   getFutureCompletedServices = (async () => {
     const { userId } = this.state;
@@ -42,51 +45,32 @@ class CurrentBidsSection extends Component {
     }
   });
 
-  // Get bids the current pet owners has which are not accepted or outbidded
-  getCurrentBids = (async () => {
-    const { userId } = this.state;
-    try {
-      const response = await axios.post('http://localhost:3030/search', {
-        post: 'getCurrentBids',
-        petownerEmail: userId,
-      });
-      if (response.status === 200) {
-        const bids = response.data;
-        this.setState({ bids: bids, highestamount: bids.highestamount, bid: bids.bid });
-        console.log("getCurrentBids:", bids);
-      }
-    } catch (err) {
-      console.error("Unable to get Bids. Error: " + err.response.data)
-      message.warn("Unable to get Bids");
-    }
-  });
-
   // Called before updating bid
   openModal(bidObj) {
     this.setState({ highestamount: bidObj.highestamount, selectedBid: bidObj, showModal: true });
   }
 
   // Add bids and return the updated bids the current pet owners has which are not accepted or outbidded
-  updateBid = (async () => {
-    const { selectedBid, newAmount } = this.state;
-    const { bid, bidamount } = selectedBid;
-    const { withdrawFromWallet, walletAmt } = this.props;
+  addBid = (async () => {
+    const { userId, selectedBid, newAmount } = this.state;
+    const { caretakeremail, dateofservice} = selectedBid;
     try {
       const response = await axios.post('http://localhost:3030/search', {
-        post: 'updateBid',
+        post: 'addBid',
+        petownerEmail: userId,
+        caretakeremail: caretakeremail,
         bidamount: newAmount,
-        bid,
+        dateofservice: dateofservice,
       });
       if (response.status === 200) {
         message.success("Bidding Successful");
-        withdrawFromWallet(newAmount - bidamount);
+        await this.props.getCurrentBids();
+        await this.props.updateWallet();
       }
     } catch (err) {
       console.error("Unable to Bid. Error: " + err.response.data)
       message.warn("Unable to Bid");
     }
-    await this.getCurrentBids();
-    this.props.updateWallet();
     this.setState({ showModal: false });
   });
 
@@ -141,7 +125,7 @@ class CurrentBidsSection extends Component {
         <Modal
           title={`Update Bid Amount:`}
           visible={showModal}
-          onOk={this.updateBid}
+          onOk={this.addBid}
           onCancel={this.handleCancel}
         >
           <span>You need to bid higher than Current Highest Bid of <b>${this.state.highestamount}</b>.</span>

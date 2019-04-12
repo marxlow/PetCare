@@ -66,7 +66,6 @@ class PetSection extends Component {
   // When component firsts load. 
   // Fetch speciesname & diets that PetCare supports.
   async componentDidMount() {
-    const { userId } = this.state;
     try {
       // Fetch diets & speciesname
       const dietResponse = await axios.post('http://localhost:3030/petsection/', { post: 'getAllDiets' });
@@ -156,60 +155,9 @@ class PetSection extends Component {
   // Closing of Alert
   handleAlertClose = (() => { this.setState({ alert: 'invisible' }); });
 
-  SubmitResponse = (e) => {
-    switch (this.state.alert) {
-      case 'success':
-        return (<Alert
-          message="Successful Update"
-          type="success"
-          showIcon
-          closable
-          afterClose={this.handleAlertClose}
-        />);
-      case 'empty':
-        return (<Alert
-          message="Error"
-          description="There are missing fields. Please input them and submit again."
-          type="error"
-          showIcon
-          closable
-          afterClose={this.handleAlertClose}
-        />);
-      // case 'duplicateName':
-      //   return <Alert
-      //       message="Warning"
-      //       description="There are duplicate Pets with similar name."
-      //       type="warning"
-      //       showIcon
-      //       closable
-      //       afterClose={this.handleAlertClose}
-      //     />;
-      case 'duplicate':
-        return (<Alert
-          message="Error"
-          description="There are duplicate Pets with similar name, species and breed."
-          type="error"
-          showIcon
-          closable
-          afterClose={this.handleAlertClose}
-        />);
-      case 'error':
-        return (<Alert
-          message="Error"
-          description="Error adding pet to database"
-          type="error"
-          showIcon
-          closable
-          afterClose={this.handleAlertClose}
-        />);
-      default:
-        return null;
-    }
-  };
-
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { speciesOpt, breedsOpt, dietsOpt, alert, pets } = this.state;
+    const { speciesOpt, breedsOpt, dietsOpt, pets } = this.state;
     return (
       <div>
         {/* Adding new pets */}

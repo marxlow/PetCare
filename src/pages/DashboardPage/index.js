@@ -85,7 +85,7 @@ class DashboardPage extends Component {
       message.warn('Error. Please try again later');
     }
   });
-  
+
   // Only for Care takers
   updateAvgRating = ((newRating) => {
     this.setState({ avgRating: newRating });
@@ -133,7 +133,7 @@ class DashboardPage extends Component {
     e.preventDefault();
     this.props.history.push('/search');
   });
-
+  
   render() {
     const { userId, role, userName, badges, wallet, avgRating } = this.state;
     if (!localStorage.getItem('role') || role === null) {
@@ -161,13 +161,17 @@ class DashboardPage extends Component {
             </div>
             <div className="col-8">
               {role === 'Pet Owner' && userId !== 'admin@gmail.com' ?
-                <PetOwnerView userId={userId} walletAmt={wallet} updateWallet={this.getWallet} depositToWallet={this.depositToWallet} withdrawFromWallet={this.withdrawFromWallet} />
+                <PetOwnerView userId={userId} walletAmt={wallet} updateWallet={this.getWallet} depositToWallet={this.depositToWallet} withdrawFromWallet={this.withdrawFromWallet} forceUpdate={this.forceUpdate}/>
                 : null
               }
               {role === 'Care Taker' ?
                 <CareTakerView userId={userId} walletAmt={wallet} updateAvgRating={this.updateAvgRating} updateWallet={this.getWallet} withdrawFromWallet={this.withdrawFromWallet} />
                 :
+                null
+              }
+              {userId === 'admin@gmail.com' ?
                 <AdminView userId={userId} />
+                : null
               }
             </div>
           </div>

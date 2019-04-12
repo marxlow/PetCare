@@ -81,15 +81,13 @@ class SearchCareTakerSection extends Component {
         bidamount,
       });
       if (response.status === 200) {
-        // const caretakers = response.data;
-        // console.log('> Loaded caretakers', caretakers);
-        // this.setState({ caretakers });
         message.success("Bidding Successful");
+        await this.props.getCurrentBids();
+        await this.props.updateWallet();
       }
     } catch (error) {
       message.warn(`Error Adding Bid`);
     }
-    this.props.updateWallet();
   });
 
   // search careTakers based on rating and date
@@ -171,7 +169,7 @@ class SearchCareTakerSection extends Component {
                   title={item.name}
                 >
                   Email: {item.email}<br />
-                  Rating: {item.avgrating}<br />
+                  Rating: {Number(item.avgrating)}<br />
                 </Card>
                 <InputNumber
                   defaultValue={item.bidamount}
