@@ -313,13 +313,20 @@ class CareTakerView extends Component {
 
   // Returns a boolean whether a date should be disabled or not
   disabledDate = ((date) => {
-    const { availabilitiesRange } = this.state;
+    const { availabilitiesRange, workDates } = this.state;
     for (let i = 0; i < availabilitiesRange.length; i++) {
       const startdateObj = moment(availabilitiesRange[i].startdate);
       const enddateObj = moment(availabilitiesRange[i].enddate);
       const dateObj = moment(date);
       // Is inbetween
       if (dateObj.isSameOrBefore(enddateObj, 'day') && dateObj.isSameOrAfter(startdateObj, 'day')) {
+        return true;
+      }
+    }
+    for (let i = 0; i < workDates.length; i ++) {
+      const workDateObj = moment(workDates[i].dateofservice);
+      const dateObj = moment(date);
+      if (dateObj.isSame(workDateObj, 'days')) {
         return true;
       }
     }
@@ -337,7 +344,6 @@ class CareTakerView extends Component {
 
   render() {
     const { reviews, serviceOptions, services, workDates, bids } = this.state;
-    console.log("Bids:", JSON.stringify(bids));
     return (
       < Tabs type="card">
 
