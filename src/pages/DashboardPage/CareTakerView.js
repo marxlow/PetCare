@@ -3,6 +3,8 @@ import { Button, List, Tabs, message, InputNumber } from 'antd';
 import axios from 'axios';
 import DateSection from './components/DateSection';
 import WalletSection from './components/WalletSection';
+import moment from 'moment';
+import iterateRangeOfDate from '../../utils/iterateRangeOfDate';
 
 const TabPane = Tabs.TabPane;
 const ListItem = List.Item;
@@ -13,7 +15,8 @@ class CareTakerView extends Component {
     super(props);
     this.state = {
       userId: this.props.userId,
-      availabilities: [],
+      availabilitiesRange: [],
+      availbilitiesDay: [],
       bids: [], //{"bid":1,"dateofservice":"2018-12-31T16:00:00.000Z","bidderemail":"po@hotmail.com","bidamount":100}
       startDate: '',
       endDate: '',
@@ -34,7 +37,7 @@ class CareTakerView extends Component {
   async componentDidMount() {
     await this.getDatesForCareTaker();
     await this.getAvgRating();
-    await this.getAllService();
+    await this.getAllAvailableServices();
     await this.getMyService();
     await this.getBids();
     await this.getWorkDates();
@@ -65,7 +68,7 @@ class CareTakerView extends Component {
     this.setState({ selectedService: event.target.value });
   });
 
-  getAllService = (async () => {
+  getAllAvailableServices = (async () => {
     try {
       const response = await axios.post('http://localhost:3030/caretaker', {
         post: 'getAllService',
@@ -77,6 +80,23 @@ class CareTakerView extends Component {
     } catch (err) {
       console.error("Unable to get Services. Error: " + err.response.data)
       message.warn("Unable to get all Service options");
+    }
+  });
+
+  getMyService = (async () => {
+    const { userId } = this.state;
+    try {
+      const response = await axios.post('http://localhost:3030/caretaker', {
+        post: 'getMyService',
+        email: userId
+      });
+      if (response.status === 200) {
+        const services = response.data;
+        this.setState({ services: services });
+      }
+    } catch (err) {
+      console.error("Unable to get User's services. Error: " + err.response.data)
+      message.warn("Unable to get your services");
     }
   });
 
@@ -100,26 +120,6 @@ class CareTakerView extends Component {
     }
   });
 
-  // Get services that the current care taker is providing
-  getMyService = (async () => {
-    const { userId } = this.state;
-    try {
-      const response = await axios.post('http://localhost:3030/caretaker', {
-        post: 'getMyService',
-        email: userId
-      });
-      if (response.status === 200) {
-        const services = response.data;
-        this.setState({ services: services });
-      }
-    } catch (err) {
-      console.error("Unable to get User's services. Error: " + err.response.data)
-      message.warn("Unable to get your services");
-    }
-  });
-
-  // Remove a service from care taker.
-  // key is the index of the service to remove in "this.state.services"
   removeService = (async (key) => {
     const { userId, services } = this.state;
     if (services.length === 0) {
@@ -143,8 +143,7 @@ class CareTakerView extends Component {
     }
   });
 
-  // getReviews: get all confirmed bids 
-  // ( input: email output: [review, rating, byuser, timestamp]), 
+  // REVIEWS SECTION
   getReviews = (async () => {
     const { userId } = this.state;
     try {
@@ -163,9 +162,7 @@ class CareTakerView extends Component {
     }
   });
 
-  //Done
-  // getWorkDates: get all confirmed bids 
-  // ( input: email output: [DateOfService, petownerEmail, price]), 
+  // WORK DATES SECTION
   getWorkDates = (async () => {
     const { userId } = this.state;
     try {
@@ -193,8 +190,7 @@ class CareTakerView extends Component {
     }
   });
 
-  // getBids: get all available bid dates and current highest bid
-  // ( input: email output: [dates, email, current highest bid]), 
+  // BIDS SECTION
   getBids = (async () => {
     const { userId } = this.state;
     try {
@@ -213,8 +209,6 @@ class CareTakerView extends Component {
     }
   });
 
-  // acceptBid: accept current highest bid of a specific day
-  // ( input: caretakerEmail, bid output: [DateOfService, petownerEmail, price])
   acceptBid = (async (bid) => {
     const { userId } = this.state;
     try {
@@ -236,59 +230,27 @@ class CareTakerView extends Component {
     await this.getBids();
   });
 
-  // Make API call to fetch dates
+  // AVAILABILITIES SECTION
   getDatesForCareTaker = (async () => {
     let availabilities = []
     try {
-      // ( input: email output: [{startdate, enddate, price}]) 
       const response = await axios.post('http://localhost:3030/caretaker', {
         post: 'getAvailability',
         email: this.state.userId,
       });
       if (response.status === 200) {
         availabilities = response.data;
-        console.log("getAvailabilities:", availabilities);
-        if (availabilities && availabilities.length > 0) {
-          // TODO Marx: transform into readable format
-        }
+        this.setState({
+          availabilitiesRange: availabilities,
+          availbilitiesDay: iterateRangeOfDate(availabilities),
+        });
       }
     } catch (err) {
       console.error("Unable to get Availabilities. Error: " + err.response.data)
       message.warn("Unable to get Availabilities.");
     }
-
-    let newAvailabilities = [];
-    for (let i = 0; i < availabilities.length; i++) {
-      const range = availabilities[i];
-      const yyyymm = range.startdate.slice(0, 8);
-      const startDay = parseInt(range.startdate.split('-')[2]);
-      const endDay = parseInt(range.enddate.split('-')[2]);
-
-      for (let j = startDay; j <= endDay; j++) {
-        if (j < 10) {
-          newAvailabilities.push(`${yyyymm}0${j}`);
-        } else {
-          newAvailabilities.push(`${yyyymm}${j}`);
-        }
-      }
-    }
-    // Remove Duplicates
-    newAvailabilities = newAvailabilities.filter((value, index, self) => {
-      return self.indexOf(value) === index;
-    });
-
-    // Sort in order of Dates
-    newAvailabilities.sort((a, b) => {
-      if (!a || !b) { return; }
-      // Turn your strings into dates, and then s ubtract them
-      // to get a value that is either negative, positive, or zero.
-      return new Date(a) - new Date(b);
-    });
-    this.setState({ availabilities: newAvailabilities });
   });
 
-  // ( input: startdate, enddate, minAutoAcceptPrice, email output: startdate, enddate(?))
-  // Add new availabilities, no duplicates and sort from earliest to latest 
   setAvailabilityForCareTaker = (async () => {
     // Create new availbility object to send to backend
     const { startDate, endDate, autoAcceptedPrice, userId } = this.state;
@@ -305,118 +267,66 @@ class CareTakerView extends Component {
       const response = await axios.post('http://localhost:3030/caretaker', newAvailability);
       if (response.status === 200) {
         availabilities = response.data;
-        // this.setState({ availabilities });
-        console.log("addAvailability:", availabilities);
+        availabilities = response.data;
+        this.setState({
+          availabilitiesRange: availabilities,
+          availbilitiesDay: iterateRangeOfDate(availabilities),
+        });
       }
     } catch (err) {
       console.error("Unable to set Availabilities. Error: " + err.response.data)
       message.warn("Unable to add Availabilities", newAvailability);
       return;
     }
-
-    // Transform start and end dates to be day by day
-    let newAvailabilities = [];
-
-    // TODO: Assumes all availbility range are in the same month
-    for (let i = 0; i < availabilities.length; i++) {
-      const range = availabilities[i];
-      const yyyymm = range.startdate.slice(0, 8);
-      const startDay = parseInt(range.startdate.split('-')[2]);
-      const endDay = parseInt(range.enddate.split('-')[2]);
-
-      for (let j = startDay; j <= endDay; j++) {
-        if (j < 10) {
-          newAvailabilities.push(`${yyyymm}0${j}`);
-        } else {
-          newAvailabilities.push(`${yyyymm}${j}`);
-        }
-      }
-    }
-
-    // Remove Duplicates
-    newAvailabilities = newAvailabilities.filter((value, index, self) => {
-      return self.indexOf(value) === index;
-    });
-
-    // Sort in order of Dates
-    newAvailabilities.sort((a, b) => {
-      if (!a || !b) { return; }
-      // Turn your strings into dates, and then s ubtract them
-      // to get a value that is either negative, positive, or zero.
-      return new Date(a) - new Date(b);
-    });
-    this.setState({ availabilities: newAvailabilities });
-
-    // TODO: @chiasin. Refresh availbilities.
-    // await this.getDatesForCareTaker();
   });
 
-  //removeAvailabilities: remove availabilities 
-  //(input: email, {date(yyyy-mm-dd format)} output: {startdate, enddate, price})
   removeAvailabilities = (async (date) => {
-    console.log("Removing date:", date);
     const { userId } = this.state;
     let availabilities = []
     try {
       const response = await axios.post('http://localhost:3030/caretaker', {
         post: 'removeAvailabilities',
         email: userId,
-        date,
+        dateToRemove: date,
       });
       if (response.status === 200) {
         availabilities = response.data;
-        this.setState({ availabilities });
-        console.log("removeAvailabilities:", availabilities);
+        availabilities = response.data;
+        this.setState({
+          availabilitiesRange: availabilities,
+          availbilitiesDay: iterateRangeOfDate(availabilities),
+        });
       }
     } catch (err) {
       console.error("Unable to remove Availabilities. Error: " + err.response.data)
       message.warn("Unable to remove Availability", date);
       return;
     }
-
-    // Transform start and end dates to be day by day
-    let newAvailabilities = [];
-
-    // TODO: Assumes all availbility range are in the same month
-    for (let i = 0; i < availabilities.length; i++) {
-      const range = availabilities[i];
-      const yyyymm = range.startdate.slice(0, 8);
-      const startDay = parseInt(range.startdate.split('-')[2]);
-      const endDay = parseInt(range.enddate.split('-')[2]);
-
-      for (let j = startDay; j <= endDay; j++) {
-        if (j < 10) {
-          newAvailabilities.push(`${yyyymm}0${j}`);
-        } else {
-          newAvailabilities.push(`${yyyymm}${j}`);
-        }
-      }
-    }
-
-    // Remove Duplicates
-    newAvailabilities = newAvailabilities.filter((value, index, self) => {
-      return self.indexOf(value) === index;
-    });
-
-    // Sort in order of Dates
-    newAvailabilities.sort((a, b) => {
-      if (!a || !b) { return; }
-      // Turn your strings into dates, and then s ubtract them
-      // to get a value that is either negative, positive, or zero.
-      return new Date(a) - new Date(b);
-    });
-    this.setState({
-      availabilities: newAvailabilities,
-    })
   });
 
-  // Called when the calendar gets updated
+  // Returns a boolean whether a date should be disabled or not
+  disabledDate = ((date) => {
+    const { availabilitiesRange } = this.state;
+    for (let i = 0; i < availabilitiesRange.length; i++) {
+      const startdateObj = moment(availabilitiesRange[i].startdate);
+      const enddateObj = moment(availabilitiesRange[i].enddate);
+      const dateObj = moment(date);
+      // Is inbetween
+      if (dateObj.isSameOrBefore(enddateObj, 'day') && dateObj.isSameOrAfter(startdateObj, 'day')) {
+        return true;
+      }
+    }
+    return false;
+  });
+
   changeDate = ((startDate, endDate) => {
     this.setState({
       startDate,
       endDate,
     });
   });
+
+
 
   render() {
     const { reviews, serviceOptions, services, workDates, bids } = this.state;
@@ -427,23 +337,25 @@ class CareTakerView extends Component {
         {/* Adding availabilities */}
         <TabPane tab="Profile" key="1">
           <div className="w-100 d-flex">
-            <section className="col-6">
+            <section className="d-flex flex-column col-6">
               <h3>Add your availabilities here</h3>
-              <DateSection changeDate={this.changeDate} title={""} />
+              <DateSection changeDate={this.changeDate} title={""} disabledDate={this.disabledDate} />
+              <span>Select your available dates</span>
               <InputNumber
                 defaultValue={this.state.autoAcceptedPrice}
-                className={"w-100"}
+                className={"mt-4"}
                 size={'large'}
                 formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                 parser={value => value.replace(/\$\s?|(,*)/g, '')}
                 onChange={this.updateAutoAcceptedPrice}
               />
+              <span>Enter your minimum acceptance bid. Any bid that goes above this amount will be automatically accepted.</span>
               <Button className="mt-4" onClick={this.setAvailabilityForCareTaker}>Add new Availability</Button>
             </section>
             <section className="col-6">
               <h3>List of Availabilities</h3>
               <List
-                dataSource={this.state.availabilities}
+                dataSource={this.state.availbilitiesDay}
                 renderItem={(item) => (
                   <List.Item>
                     <ListItemMeta title={item} />
