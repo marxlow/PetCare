@@ -101,8 +101,6 @@ class DashboardPage extends Component {
                 <Divider />
                 <h5>Badge: {badges.badge}</h5>
                 <Divider />
-                <h5>Wallet Amount: ${wallet}</h5>
-                <Divider />
                 {role !== 'Pet Owner' ? <h5>Rating: {avgRating}</h5> : null}
               </div>
             </div>
