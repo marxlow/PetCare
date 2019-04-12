@@ -53,12 +53,15 @@ class CurrentBidsSection extends Component {
 
   // Add bids and return the updated bids the current pet owners has which are not accepted or outbidded
   updateBid = (async () => {
-    const { userId, newamount, bid } = this.state;
+    const { userId, selectedBid, newamount } = this.state;
+    const { caretakeremail, dateofservice } = selectedBid;
     try {
       const response = await axios.post('http://localhost:3030/search', {
-        post: 'updateBid',
-        bid: bid,
+        post: 'addBid',
         bidamount: newamount,
+        caretakeremail,
+        petownerEmail: userId,
+        dateofservice,
       });
       if (response.status === 200) {
         message.warn("Bidding Successful");
