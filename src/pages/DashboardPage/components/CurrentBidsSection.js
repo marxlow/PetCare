@@ -10,6 +10,7 @@ class CurrentBidsSection extends Component {
       userId: this.props.userId,
       selectedBid: '',
       bids: [], // {caretakeremail, highestBidderEmail, currentTopbidamt , dateofservice, bidtimestamp },
+      confirmedBids: [],
       openModal: false,
       newAmount: 0,
       highestamount: 0,
@@ -20,7 +21,25 @@ class CurrentBidsSection extends Component {
   // When component first loads, find all bids belonging to current user
   async componentDidMount() {
     await this.getCurrentBids();
+    await this.getFutureCompletedServices();
   }
+  // Get bids that are won by the pet owner and are in the future
+  getFutureCompletedServices = (async () => {
+    const { userId } = this.state;
+    try {
+      const response = await axios.post('http://localhost:3030/search', {
+        post: 'getFutureCompletedServices',
+        petownerEmail: userId,
+      });
+      if (response.status === 200) {
+        const confirmedBids = response.data;
+        this.setState({ confirmedBids });
+      }
+    } catch (err) {
+      console.error("Unable to get Bids. Error: " + err.response.data)
+      message.warn("Unable to get Bids");
+    }
+  });
 
   // Get bids the current pet owners has which are not accepted or outbidded
   getCurrentBids = (async () => {
@@ -79,10 +98,25 @@ class CurrentBidsSection extends Component {
   });
 
   render() {
-    const { showModal, bids } = this.state;
+    const { showModal, bids, confirmedBids } = this.state;
     return (
       <div className="w-100">
-        <h3>Confirmed Bids</h3>
+        <h3>Confirmed Future Bids</h3>
+        <List
+          bordered
+          dataSource={confirmedBids}
+          renderItem={((item) => {
+            return (
+              <List.Item>
+                <div className="d-flex w-100 justify-content-between">
+                  <span>{`Date: ${item.dateofservice}`}</span>
+                  <span>{`My Winning Bid: $${item.bidamount}`}</span>
+                  <span>{`CareTaker: ${item.caretakername}`}</span>
+                </div>
+              </List.Item>
+            )
+          })}
+        />
         <Divider />
         <h3>Bids in Process</h3>
         <List
@@ -113,13 +147,13 @@ class CurrentBidsSection extends Component {
           <br></br>
           <br></br>
           <InputNumber
-                    defaultValue={0}
-                    className={"w-100"}
-                    size={'large'}
-                    formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                    parser={value => value.replace(/\$\s?|(,*)/g, '')}
-                    onChange={this.updateBidAmount}
-                  />
+            defaultValue={0}
+            className={"w-100"}
+            size={'large'}
+            formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+            parser={value => value.replace(/\$\s?|(,*)/g, '')}
+            onChange={this.updateBidAmount}
+          />
         </Modal>
       </div >
     )
