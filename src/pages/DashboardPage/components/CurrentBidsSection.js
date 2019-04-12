@@ -23,8 +23,11 @@ class CurrentBidsSection extends Component {
     await this.getFutureCompletedServices();
   }
 
-  UNSAFE_componentWillReceiveProps() {
-    this.forceUpdate();
+  async componentWillReceiveProps(props) {
+    this.setState({
+      bids: props.bids,
+    });
+    await this.getFutureCompletedServices();
   }
   
   // Get bids that are won by the pet owner and are in the future
