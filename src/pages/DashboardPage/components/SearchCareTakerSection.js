@@ -42,6 +42,7 @@ class SearchCareTakerSection extends Component {
       });
       if (response.status === 200) {
         const serviceOptions = response.data;
+        serviceOptions.unshift({ serviceid: "Any" });
         this.setState({ serviceOptions: serviceOptions, serviceid: serviceOptions[0].serviceid });
       }
     } catch (err) {
@@ -94,13 +95,16 @@ class SearchCareTakerSection extends Component {
   searchCaretakers = (async () => {
     const { rating, bidamount, date, serviceid } = this.state;
     try {
-      const response = await axios.post('http://localhost:3030/search/', {
+      const data = {
         post: 'searchCaretakers',
-        serviceid,
         rating,
         bidamount,
         dateofservice: date,
-      });
+      };
+      if (serviceid !== 'Any') {
+        data['serviceid'] = serviceid;
+      }
+      const response = await axios.post('http://localhost:3030/search/', data);
       if (response.status === 200) {
         const caretakers = response.data;
         console.log('> Loaded Caretakers', caretakers);
@@ -114,37 +118,18 @@ class SearchCareTakerSection extends Component {
 
   render() {
     const { email, rating, caretakers, serviceOptions } = this.state;
-    console.log("PetOwner email:", email, this.props.userId);
-    const resultStub = [
-      {
-        name: "John Doe",
-        bidamount: 5,
-        rating: 4.5,
-        email: 'Dogs'
-      },
-      {
-        name: "John Tan",
-        bidamount: 5,
-        rating: 4.5,
-        email: 'Dogs'
-      },
-      {
-        name: "John Low",
-        bidamount: 5,
-        rating: 4.5,
-        email: 'Dogs'
-      }
-    ]
     return (
       <div className="d-flex flex-column">
+
+        <h3>Find a Care Taker!</h3>
         {/* Search Section */}
-        <section className="d-flex flex-column mt-2">
+        <section className="d-flex flex-column mt-3">
           <div className="col-5 d-flex flex-column">
-            <span>Rating</span>
+            <span>{`Minimum Rating of ${rating} stars`}</span>
             <Slider defaultValue={rating} max={5} min={1} onChange={this.updateSearchRating} />
           </div>
-          <div className="col-5 d-flex flex-column mt-2">
-            <span>Bid Amount</span>
+          <div className="col-5 d-flex flex-column mt-3">
+            <span>With Current Bid Less Than</span>
             <InputNumber
               defaultValue={0}
               className={"w-100"}
@@ -153,13 +138,13 @@ class SearchCareTakerSection extends Component {
               onChange={this.updateBidAmount}
             />
           </div>
-          <div className="col-5 d-flex flex-column mt-2">
-            <span>Start Date</span>
+          <div className="col-5 d-flex flex-column mt-3">
+            <span>Date</span>
             <div>
               <DatePicker onChange={this.updateStartDate} placeHolder="Choose a date" />
             </div>
           </div>
-          <div className="col-5 d-flex flex-column mt-2">
+          <div className="col-5 d-flex flex-column mt-3">
             <span>Services</span>
             <select id="inputState" className="form-control" onChange={this.updateSelectedService}>
               {serviceOptions.map((service, key) => (
@@ -167,7 +152,7 @@ class SearchCareTakerSection extends Component {
               ))}
             </select>
           </div>
-          <div className="d-flex justify-content-center mt-2">
+          <div className="d-flex justify-content-center mt-3">
             <Button className="col-3 mt-2" type="primary" htmlType="submit" onClick={this.searchCaretakers}>Search</Button>
           </div>
         </section>
