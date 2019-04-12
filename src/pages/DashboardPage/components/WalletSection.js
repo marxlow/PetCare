@@ -48,7 +48,7 @@ class WalletSection extends Component {
   depositFromWallet = (async () => {
     const { userId, walletAmt, amountToChange } = this.state;
     const updatedWalletAmt = walletAmt + amountToChange;
-    
+
     // Make actual withdrawal
     try {
       const response = await axios.post('http://localhost:3030/wallet', {
@@ -90,7 +90,10 @@ class WalletSection extends Component {
               onChange={this.updateAmountToChange}
             />
             <Button className="mr-4" onClick={this.withdrawFromWallet}>Withdraw</Button>
-            <Button onClick={this.depositFromWallet}>Deposit</Button>
+            {this.props.hasDeposit ?
+              <Button onClick={this.depositFromWallet}>Deposit</Button>
+              : null
+            }
           </div>
         </section>
       </div>

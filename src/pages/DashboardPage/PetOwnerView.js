@@ -34,7 +34,7 @@ class PetOwnerView extends Component {
 
         {/* Wallet of user. Can Deposit or Withdraw */}
         <TabPane tab="Wallet" key="5">
-          <WalletSection userId={userId} walletAmt={walletAmt} />
+          <WalletSection userId={userId} walletAmt={walletAmt} hasDeposit={true} />
         </TabPane>
       </Tabs>
     )

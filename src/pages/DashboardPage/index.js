@@ -108,7 +108,7 @@ class DashboardPage extends Component {
               {role === 'Pet Owner' ?
                 <PetOwnerView userId={userId} walletAmt={wallet} />
                 :
-                <CareTakerView userId={userId} updateAvgRating={this.updateAvgRating} />
+                <CareTakerView userId={userId} walletAmt={wallet} updateAvgRating={this.updateAvgRating} />
               }
             </div>
           </div>
