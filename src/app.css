@@ -21,3 +21,7 @@
 .fs-4 {
   font-size: 4rem;
 }
+
+.ant-list {
+  width: 100% !important;
+}

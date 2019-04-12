@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, List, Tabs, message, InputNumber } from 'antd';
+import { Button, List, Tabs, message, InputNumber, Rate } from 'antd';
 import axios from 'axios';
 import DateSection from './components/DateSection';
 import WalletSection from './components/WalletSection';
@@ -41,6 +41,7 @@ class CareTakerView extends Component {
     await this.getMyService();
     await this.getBids();
     await this.getWorkDates();
+    await this.getReviews();
   }
 
   // Fetch average ratings for care taker 
@@ -148,13 +149,12 @@ class CareTakerView extends Component {
     const { userId } = this.state;
     try {
       const response = await axios.post('http://localhost:3030/review', {
-        post: 'getReviews',
+        post: 'getReviewsForUser',
         email: userId,
       });
       if (response.status === 200) {
         const reviews = response.data;
         this.setState({ reviews: reviews });
-        console.log("getWorkDates:", reviews);
       }
     } catch (err) {
       console.error("Unable to get Reviews. Error: " + err.response.data)
@@ -399,7 +399,7 @@ class CareTakerView extends Component {
 
         {/* Work Hx and Reviews of care taker */}
         <TabPane tab="Your Past Work" key="3">
-          <div className="w-100 d-flex">
+          <div className="w-100">
             <List
               bordered
               itemLayout="horizontal"
@@ -409,9 +409,12 @@ class CareTakerView extends Component {
                   <List.Item>
                     <div className="w-100">
                       <ListItemMeta
-                        title={`${review.name} | ${review.email}`}
-                        description={`${review.review} | Rating:${review.rating} | Date of Service:${review.dateofservice} | Accepted Amount: ${review.bidamount} | ${review.rid} | ${review.timestamp}`}
+                        title={`From ${review.byuser}`}
                       />
+                      <div className="d-flex flex-column">
+                        <Rate value={review.rating} />
+                        <span className="mt-2">{review.review}</span>
+                      </div>
                     </div>
                   </List.Item>
                 )
@@ -431,9 +434,10 @@ class CareTakerView extends Component {
                   <List.Item>
                     <div className="w-100">
                       <ListItemMeta
-                        title={`${item.dateofservice}`}
-                        description={`Pet Owner:${item.bidderemail} | Accepted Amount:${item.bidamount} | ${item.bid}`}
+                        title={item.bidderemail}
+                        description={item.dateofservice}
                       />
+                      <span className="mt-1">${item.bidamount}</span>
                     </div>
                   </List.Item>
                 )
@@ -444,22 +448,21 @@ class CareTakerView extends Component {
 
         {/* Bids */}
         <TabPane tab="Your Bids" key="5">
-          <div className="w-100 d-flex">
-            <section className="col-6">
-              <h3>List of Bids</h3>
-              <List
-                dataSource={bids}
-                renderItem={(item) => (
-                  <List.Item>
-                    <ListItemMeta
-                      title={item.dateofservice}
-                      description={`Amount:$${item.bidamount} | ${item.bidderemail}`}
-                    />
-                    <Button icon="submit" onClick={(() => this.acceptBid(item.bid))}>Accept</Button>
-                  </List.Item>
-                )}
-              />
-            </section>
+          <div className="w-100 d-flex flex-column">
+            <h3>List of Bids</h3>
+            <List
+              bordered
+              dataSource={bids}
+              renderItem={(item) => (
+                <List.Item>
+                  <ListItemMeta
+                    title={item.dateofservice}
+                    description={`Amount:$${item.bidamount} | ${item.bidderemail}`}
+                  />
+                  <Button icon="submit" onClick={(() => this.acceptBid(item.bid))}>Accept</Button>
+                </List.Item>
+              )}
+            />
           </div>
         </TabPane>
 
