@@ -64,7 +64,7 @@ class CurrentBidsSection extends Component {
         dateofservice,
       });
       if (response.status === 200) {
-        message.warn("Bidding Successful");
+        message.success("Bidding Successful");
       }
     } catch (err) {
       console.error("Unable to Bid. Error: " + err.response.data)

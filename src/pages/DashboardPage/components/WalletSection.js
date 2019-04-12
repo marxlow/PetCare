@@ -13,23 +13,6 @@ class WalletSection extends Component {
     }
   }
 
-  async componentDidUpdate() {
-    const { userId } = this.state;
-    // Get Wallet
-    try {
-      const response = await axios.post('http://localhost:3030/wallet/', {
-        post: 'getWallet',
-        email: userId,
-      });
-      if (response.status === 200) {
-        const wallet = response.data.rows[0].walletamt;
-        this.setState({ walletAmt: Number(wallet) });
-      }
-    } catch (err) {
-      console.error("Unable to get wallet. Error: " + err.response.data)
-    }
-  }
-
   updateAmountToChange = ((value) => {
     this.setState({ amountToChange: value });
   });

@@ -96,7 +96,7 @@ class RegisterPage extends Component {
     }
     if (response.status === 200) {
       console.log("Response> " + response.data)
-      message.warn("Successful Registration")
+      message.success("Successful Registration")
       this.props.history.push('/login');
       // this.setState({ alert: 'success' });
     } else {

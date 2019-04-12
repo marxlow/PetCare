@@ -82,7 +82,7 @@ class SearchCareTakerSection extends Component {
         // const caretakers = response.data;
         // console.log('> Loaded caretakers', caretakers);
         // this.setState({ caretakers });
-        message.warn("Bidding Successful");
+        message.success("Bidding Successful");
       }
     } catch (error) {
       message.warn(`Error Adding Bid`);
