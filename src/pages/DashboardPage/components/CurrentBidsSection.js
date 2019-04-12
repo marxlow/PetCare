@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { List, Button, Modal, Typography, Rate, Icon, message, InputNumber } from 'antd';
+import { List, Button, Modal, message, InputNumber, Divider } from 'antd';
 import axios from 'axios';
 
 class CurrentBidsSection extends Component {
@@ -10,8 +10,9 @@ class CurrentBidsSection extends Component {
       userId: this.props.userId,
       selectedBid: '',
       bids: [], // {caretakeremail, highestBidderEmail, currentTopbidamt , dateofservice, bidtimestamp },
+      confirmedBids: [],
       openModal: false,
-      newamount: 0,
+      newAmount: 0,
       highestamount: 0,
       bid: 0
     };
@@ -20,14 +21,27 @@ class CurrentBidsSection extends Component {
   // When component first loads, find all bids belonging to current user
   async componentDidMount() {
     await this.getCurrentBids();
+    await this.getFutureCompletedServices();
   }
+  // Get bids that are won by the pet owner and are in the future
+  getFutureCompletedServices = (async () => {
+    const { userId } = this.state;
+    try {
+      const response = await axios.post('http://localhost:3030/search', {
+        post: 'getFutureCompletedServices',
+        petownerEmail: userId,
+      });
+      if (response.status === 200) {
+        const confirmedBids = response.data;
+        this.setState({ confirmedBids });
+      }
+    } catch (err) {
+      console.error("Unable to get Bids. Error: " + err.response.data)
+      message.warn("Unable to get Bids");
+    }
+  });
 
   // Get bids the current pet owners has which are not accepted or outbidded
-  // input : email(pet owner),
-  // output : [{ caretakeremail,
-  // highestBidderEmail, currentTopbidamt( status = 'current highest') ,
-  // dateofservice,
-  // timestampByHighest,  }]
   getCurrentBids = (async () => {
     const { userId } = this.state;
     try {
@@ -53,12 +67,12 @@ class CurrentBidsSection extends Component {
 
   // Add bids and return the updated bids the current pet owners has which are not accepted or outbidded
   updateBid = (async () => {
-    const { userId, selectedBid, newamount } = this.state;
+    const { userId, selectedBid, newAmount } = this.state;
     const { caretakeremail, dateofservice } = selectedBid;
     try {
       const response = await axios.post('http://localhost:3030/search', {
         post: 'addBid',
-        bidamount: newamount,
+        bidamount: newAmount,
         caretakeremail,
         petownerEmail: userId,
         dateofservice,
@@ -72,6 +86,7 @@ class CurrentBidsSection extends Component {
     }
     await this.getCurrentBids();
     this.props.updateWallet();
+    this.setState({ showModal: false });
   });
 
   handleCancel = (() => {
@@ -79,13 +94,31 @@ class CurrentBidsSection extends Component {
   });
 
   updateBidAmount = ((value) => {
-    this.setState({ newamount: value });
+    this.setState({ newAmount: value });
   });
-  render() {
-    const { showModal, reviewMessage, careTakerEmail, bids, highestamount } = this.state;
 
+  render() {
+    const { showModal, bids, confirmedBids } = this.state;
     return (
       <div className="w-100">
+        <h3>Confirmed Future Bids</h3>
+        <List
+          bordered
+          dataSource={confirmedBids}
+          renderItem={((item) => {
+            return (
+              <List.Item>
+                <div className="d-flex w-100 justify-content-between">
+                  <span>{`Date: ${item.dateofservice}`}</span>
+                  <span>{`My Winning Bid: $${item.bidamount}`}</span>
+                  <span>{`CareTaker: ${item.caretakername}`}</span>
+                </div>
+              </List.Item>
+            )
+          })}
+        />
+        <Divider />
+        <h3>Bids in Process</h3>
         <List
           bordered
           dataSource={bids}
@@ -94,9 +127,9 @@ class CurrentBidsSection extends Component {
               <List.Item>
                 <div className="d-flex w-100 justify-content-between">
                   <span>{`Date: ${item.dateofservice}`}</span>
-                  <span>{`My Bid Amt: $${item.bidamount}`}</span>
-                  <span>{`Taker: ${item.name}`}</span>
-                  <span>{`Taker Amt: $${item.highestamount}`}</span>
+                  <span>{`My Bid: $${item.bidamount}`}</span>
+                  <span>{`CareTaker: ${item.name}`}</span>
+                  <span>{`Highest Bid: $${item.highestamount}`}</span>
                   <Button icon="submit" onClick={() => this.openModal(item)}>Update Bid</Button>
                 </div>
               </List.Item>
@@ -114,13 +147,13 @@ class CurrentBidsSection extends Component {
           <br></br>
           <br></br>
           <InputNumber
-                    defaultValue={0}
-                    className={"w-100"}
-                    size={'large'}
-                    formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                    parser={value => value.replace(/\$\s?|(,*)/g, '')}
-                    onChange={this.updateBidAmount}
-                  />
+            defaultValue={0}
+            className={"w-100"}
+            size={'large'}
+            formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+            parser={value => value.replace(/\$\s?|(,*)/g, '')}
+            onChange={this.updateBidAmount}
+          />
         </Modal>
       </div >
     )

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {List, Button, Modal, Typography, Rate, Icon, message} from 'antd';
+import { List, Button, Modal, Typography, Rate, Icon, message } from 'antd';
 import axios from 'axios';
 
 const { Paragraph } = Typography;
@@ -25,7 +25,7 @@ class CompletedServicesSection extends Component {
 
   // When component first loads, find all bids belonging to current user
   async componentDidMount() {
-      this.getAllCompletedServices();
+    this.getAllCompletedServices();
   }
 
   getAllCompletedServices = (async () => {
@@ -33,8 +33,8 @@ class CompletedServicesSection extends Component {
     try {
       // Fetch completed services
       const response = await axios.post('http://localhost:3030/search/', {
-        post:           'getAllCompletedServices',
-        petownerEmail:  userId,
+        post: 'getAllCompletedServices',
+        petownerEmail: userId,
       });
       if (response.status === 200) {
         const completed = response.data;
@@ -57,9 +57,9 @@ class CompletedServicesSection extends Component {
     try {
       // Fetch completed services
       const response = await axios.post('http://localhost:3030/review/', {
-        post:   'createReview',
-        email:  caretakeremail,
-        bid:    bid,
+        post: 'createReview',
+        email: caretakeremail,
+        bid: bid,
         review: reviewMessage,
         rating: rating,
         byUser: userId,
@@ -85,7 +85,7 @@ class CompletedServicesSection extends Component {
     this.setState({ reviewMessage: text });
   });
 
-  updateRating = ((value) =>{
+  updateRating = ((value) => {
     this.setState({ rating: value });
   });
 
@@ -116,7 +116,7 @@ class CompletedServicesSection extends Component {
           onOk={this.handleOk}
           onCancel={this.handleCancel}
         >
-          <Rate className="mb-4" onChange={this.updateRating}/>
+          <Rate className="mb-4" onChange={this.updateRating} />
           <Paragraph editable={{ onChange: this.handleWriting }}>{reviewMessage}</Paragraph>
         </Modal>
       </div >

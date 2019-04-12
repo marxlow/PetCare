@@ -7,13 +7,34 @@ class WalletSection extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      walletAmt: Number(this.props.walletAmt),
+      walletAmt: 0,
       userId: this.props.userId,
       amountToChange: 0, // Only positive integers
     }
   }
 
+  async componentDidMount() {
+    const { userId } = this.state;
+    // Get Wallet
+    try {
+      const response = await axios.post('http://localhost:3030/wallet/', {
+        post: 'getWallet',
+        email: userId,
+      });
+      if (response.status === 200) {
+        const wallet = response.data.rows[0].walletamt;
+        this.setState({ walletAmt: Number(wallet) });
+      }
+    } catch (err) {
+      console.error("Unable to get wallet. Error: " + err.response.data)
+    }
+  }
+
   updateAmountToChange = ((value) => {
+    if (value < 0) {
+      message.warn('Cannot go below 0');
+      return;
+    }
     this.setState({ amountToChange: value });
   });
 
