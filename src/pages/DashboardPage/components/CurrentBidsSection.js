@@ -19,7 +19,8 @@ class CurrentBidsSection extends Component {
       bids: bidsStub, // {caretakeremail, highestBidderEmail, currentTopbidamt , dateofservice, bidtimestamp },
       openModal: false,
       newamount: 0,
-      highestamount: 0
+      highestamount: 0,
+      bid: 0
     };
   }
 
@@ -43,7 +44,7 @@ class CurrentBidsSection extends Component {
       });
       if (response.status === 200) {
         const bids = response.data;
-        this.setState({ bids: bids, highestamount: bids.highestamount });
+        this.setState({ bids: bids, highestamount: bids.highestamount, bid: bids.bid });
         console.log("getCurrentBids:", bids);
       }
     } catch (err) {
@@ -59,15 +60,11 @@ class CurrentBidsSection extends Component {
 
   // Add bids and return the updated bids the current pet owners has which are not accepted or outbidded
   updateBid = (async () => {
-    //bid = {"bid":1,"dateofservice":"2018-12-31T16:00:00.000Z","bidderemail":"po@hotmail.com","bidamount":100}
-    const { userId, newamount, selectedBid } = this.state;
-    const { caretakeremail, dateofservice } = selectedBid;
+    const { userId, newamount, bid } = this.state;
     try {
       const response = await axios.post('http://localhost:3030/search', {
-        post: 'addBid',
-        caretakeremail,
-        petownerEmail: userId,
-        dateofservice,
+        post: 'updateBid',
+        bid: bid,
         bidamount: newamount,
       });
       if (response.status === 200) {
@@ -111,11 +108,14 @@ class CurrentBidsSection extends Component {
         />
         {/* Modal to add Bid */}
         <Modal
-          title={`Update Bid: (Current Highest Bid Amount: $${highestamount})`}
+          title={`Update Bid Amount:`}
           visible={showModal}
           onOk={this.updateBid}
           onCancel={this.handleCancel}
         >
+          <span>You need to bid higher than Current Highest Bid of <b>${this.state.highestamount}</b>.</span>
+          <br></br>
+          <br></br>
           <InputNumber
                     defaultValue={0}
                     className={"w-100"}
