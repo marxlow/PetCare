@@ -2,13 +2,6 @@ import React, { Component } from 'react';
 import { List, Button, Modal, Typography, Rate, Icon, message, InputNumber } from 'antd';
 import axios from 'axios';
 
-const { Paragraph } = Typography;
-
-const bidsStub = [
-  {caretakeremail: 'bob@gmail.com', highestbidderemail: 'greg@gmail.com', currenttopbidamt: 150 , dateofservice: '2019-01-15' , bidtimestamp: '2019-01-15' },
-  {caretakeremail: 'bod@gmail.com', highestbidderemail: 'gre@gmail.com', currenttopbidamt: 150 , dateofservice: '2019-01-15' , bidtimestamp: '2019-01-15' },
-]
-
 class CurrentBidsSection extends Component {
 
   constructor(props) {
@@ -16,7 +9,7 @@ class CurrentBidsSection extends Component {
     this.state = {
       userId: this.props.userId,
       selectedBid: '',
-      bids: bidsStub, // {caretakeremail, highestBidderEmail, currentTopbidamt , dateofservice, bidtimestamp },
+      bids: [], // {caretakeremail, highestBidderEmail, currentTopbidamt , dateofservice, bidtimestamp },
       openModal: false,
       newamount: 0,
       highestamount: 0,

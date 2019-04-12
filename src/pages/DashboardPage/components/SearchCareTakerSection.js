@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Slider, Button, List, Card, Divider, InputNumber, DatePicker, message} from 'antd';
+import { Slider, Button, List, Card, Divider, InputNumber, DatePicker, message } from 'antd';
 import axios from "axios";
 
 const ListItem = List.Item;
@@ -56,8 +56,8 @@ class SearchCareTakerSection extends Component {
     console.log("updateConfirmBidAmt:", value, caretakerEmail);
     const { caretakers } = this.state;
     const newCaretakers = Object.assign([], caretakers);
-    for (var i=0; i<newCaretakers.length; i++){
-      if (newCaretakers[i].email === caretakerEmail){
+    for (var i = 0; i < newCaretakers.length; i++) {
+      if (newCaretakers[i].email === caretakerEmail) {
         newCaretakers[i].bidamount = value;
         break;
       }
@@ -145,11 +145,11 @@ class SearchCareTakerSection extends Component {
           <div className="col-5 d-flex flex-column mt-2">
             <span>Bid Amount</span>
             <InputNumber
-                defaultValue={0}
-                className={"w-100"}
-                formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                parser={value => value.replace(/\$\s?|(,*)/g, '')}
-                onChange={this.updateBidAmount}
+              defaultValue={0}
+              className={"w-100"}
+              formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+              parser={value => value.replace(/\$\s?|(,*)/g, '')}
+              onChange={this.updateBidAmount}
             />
           </div>
           <div className="col-5 d-flex flex-column mt-2">
@@ -162,7 +162,7 @@ class SearchCareTakerSection extends Component {
             <span>Services</span>
             <select id="inputState" className="form-control" onChange={this.updateSelectedService}>
               {serviceOptions.map((service, key) => (
-                  <option key={key} value={service.serviceid}>{service.serviceid}</option>
+                <option key={key} value={service.serviceid}>{service.serviceid}</option>
               ))}
             </select>
           </div>
@@ -171,7 +171,7 @@ class SearchCareTakerSection extends Component {
           </div>
         </section>
         <Divider />
-        
+
         {/* Results Section */}
         <section className="d-flex flex-wrap mt-4">
           <List
@@ -201,7 +201,7 @@ class SearchCareTakerSection extends Component {
             )}
           />
           <small id="bidHelp" className="form-text text-muted">
-          Bid Amount will be deducted from wallet. It will be refunded if you are outbidded.</small>
+            Bid Amount will be deducted from wallet. It will be refunded if you are outbidded.</small>
         </section>
       </div>
     )
